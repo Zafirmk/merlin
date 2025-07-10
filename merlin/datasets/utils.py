@@ -16,7 +16,9 @@ def get_venv_data_dir() -> Path:
     Get the data directory within the current virtual environment.
     Creates a 'datasets' directory in the site-packages folder.
     """
-    if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+    if hasattr(sys, "real_prefix") or (
+        hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
+    ):
         # We're in a venv/virtualenv
         # Get the site-packages directory of the current environment
         site_packages = site.getsitepackages()[0]
@@ -45,7 +47,7 @@ def url_to_filename(url: str) -> str:
     url_hash = hashlib.sha256(url.encode()).hexdigest()[:8]
 
     # If the file is gzipped, insert hash before .gz
-    if original_filename.endswith('.gz'):
+    if original_filename.endswith(".gz"):
         base = original_filename[:-3]
         return f"{base}_{url_hash}.gz"
     else:
@@ -79,7 +81,7 @@ def fetch(url: str, data_dir: Path = None, force: bool = False) -> Path:
     filepath = data_dir / filename
 
     # If file is gzipped, get the name without .gz
-    if filename.endswith('.gz'):
+    if filename.endswith(".gz"):
         # Include the hash in the extracted filename
         extracted_filename = filename[:-3]  # Remove .gz but keep the hash
         extracted_path = data_dir / extracted_filename
@@ -106,10 +108,10 @@ def fetch(url: str, data_dir: Path = None, force: bool = False) -> Path:
     urllib.request.urlretrieve(url, filepath)
 
     # If file is gzipped, extract it and remove the compressed file
-    if filename.endswith('.gz'):
+    if filename.endswith(".gz"):
         print(f"Extracting {filename}...")
-        with gzip.open(filepath, 'rb') as f_in:
-            with open(extracted_path, 'wb') as f_out:
+        with gzip.open(filepath, "rb") as f_in:
+            with open(extracted_path, "wb") as f_out:
                 f_out.write(f_in.read())
         filepath.unlink()  # Remove the gzipped file
         return extracted_path
@@ -133,21 +135,23 @@ def read_idx(filepath: Path) -> Tuple[np.ndarray, dict]:
     dtype_map = {
         0x08: np.uint8,
         0x09: np.int8,
-        0x0B: np.dtype('>i2'),  # short, big-endian
-        0x0C: np.dtype('>i4'),  # int, big-endian
-        0x0D: np.dtype('>f4'),  # float, big-endian
-        0x0E: np.dtype('>f8'),  # double, big-endian
+        0x0B: np.dtype(">i2"),  # short, big-endian
+        0x0C: np.dtype(">i4"),  # int, big-endian
+        0x0D: np.dtype(">f4"),  # float, big-endian
+        0x0E: np.dtype(">f8"),  # double, big-endian
     }
 
-    with open(filepath, 'rb') as f:
+    with open(filepath, "rb") as f:
         # Read magic number
-        magic = int.from_bytes(f.read(4), byteorder='big')
-        data_type = (magic >> 8) & 0xff  # Third byte
-        n_dims = magic & 0xff  # Fourth byte
+        magic = int.from_bytes(f.read(4), byteorder="big")
+        data_type = (magic >> 8) & 0xFF  # Third byte
+        n_dims = magic & 0xFF  # Fourth byte
 
         # Verify magic number format
         if (magic >> 16) != 0:
-            raise ValueError(f"Invalid magic number (first 2 bytes must be 0): {magic:08x}")
+            raise ValueError(
+                f"Invalid magic number (first 2 bytes must be 0): {magic:08x}"
+            )
 
         if data_type not in dtype_map:
             raise ValueError(f"Unknown data type: {data_type:02x}")
@@ -155,7 +159,7 @@ def read_idx(filepath: Path) -> Tuple[np.ndarray, dict]:
         # Read dimensions
         dims = []
         for i in range(n_dims):
-            dim_size = int.from_bytes(f.read(4), byteorder='big')
+            dim_size = int.from_bytes(f.read(4), byteorder="big")
             dims.append(dim_size)
 
         # Read the data
@@ -167,18 +171,18 @@ def read_idx(filepath: Path) -> Tuple[np.ndarray, dict]:
 
         # Create metadata dictionary
         metadata = {
-            'magic': magic,
-            'data_type': data_type,
-            'dtype': dtype,
-            'dims': dims
+            "magic": magic,
+            "data_type": data_type,
+            "dtype": dtype,
+            "dims": dims,
         }
 
         return data, metadata
 
 
-def df_to_xy(df: pd.DataFrame,
-             feature_cols: list = None,
-             label_cols: list = None) -> tuple[np.ndarray, np.ndarray]:
+def df_to_xy(
+    df: pd.DataFrame, feature_cols: list = None, label_cols: list = None
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Convert pandas DataFrame to numpy arrays for features (X) and labels (y)
 
@@ -211,14 +215,16 @@ def df_to_xy(df: pd.DataFrame,
 
     return X, y
 
+
 if __name__ == "__main__":
+
     def _test_fetch():
         """Test the fetch function with MNIST dataset files"""
         mnist_urls = [
             "https://storage.googleapis.com/cvdf-datasets/mnist/train-images-idx3-ubyte.gz",
             "https://storage.googleapis.com/cvdf-datasets/mnist/train-labels-idx1-ubyte.gz",
             "https://storage.googleapis.com/cvdf-datasets/mnist/t10k-images-idx3-ubyte.gz",
-            "https://storage.googleapis.com/cvdf-datasets/mnist/t10k-labels-idx1-ubyte.gz"
+            "https://storage.googleapis.com/cvdf-datasets/mnist/t10k-labels-idx1-ubyte.gz",
         ]
 
         print(f"Data directory: {get_venv_data_dir()}")

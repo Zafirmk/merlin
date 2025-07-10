@@ -8,10 +8,13 @@ from torch import nn as nn
 @dataclass
 class MLPConfig:
     """Configuration for Multi-Layer Perceptron"""
+
     hidden_sizes: List[int] = None
     dropout: float = 0.0
-    activation: Literal['relu', 'tanh', 'sigmoid', 'leaky_relu', 'elu', 'gelu', 'selu'] = 'relu'
-    normalization: Optional[Literal['batch', 'layer']] = None
+    activation: Literal[
+        "relu", "tanh", "sigmoid", "leaky_relu", "elu", "gelu", "selu"
+    ] = "relu"
+    normalization: Optional[Literal["batch", "layer"]] = None
 
 
 class MLP(nn.Module):
@@ -31,16 +34,16 @@ class MLP(nn.Module):
 
     # Class-level mapping of available activation functions
     ACTIVATIONS = {
-        'relu': nn.ReLU(),
-        'tanh': nn.Tanh(),
-        'sigmoid': nn.Sigmoid(),
-        'leaky_relu': nn.LeakyReLU(),
-        'elu': nn.ELU(),
-        'gelu': nn.GELU(),
-        'selu': nn.SELU(),
+        "relu": nn.ReLU(),
+        "tanh": nn.Tanh(),
+        "sigmoid": nn.Sigmoid(),
+        "leaky_relu": nn.LeakyReLU(),
+        "elu": nn.ELU(),
+        "gelu": nn.GELU(),
+        "selu": nn.SELU(),
     }
 
-    def __init__(self, input_size:int, output_size:int, config: MLPConfig):
+    def __init__(self, input_size: int, output_size: int, config: MLPConfig):
         super().__init__()
         last_layer_size = input_size
         layers = []
@@ -57,9 +60,9 @@ class MLP(nn.Module):
             layers.append(nn.Linear(last_layer_size, layer_size))
 
             # Add normalization if specified
-            if config.normalization == 'batch':
+            if config.normalization == "batch":
                 layers.append(nn.BatchNorm1d(layer_size))
-            elif config.normalization == 'layer':
+            elif config.normalization == "layer":
                 layers.append(nn.LayerNorm(layer_size))
 
             # Add activation function
@@ -77,7 +80,7 @@ class MLP(nn.Module):
         # Create sequential model from layers
         self.network = nn.Sequential(*layers)
 
-    def initialize_weights(self, method='xavier'):
+    def initialize_weights(self, method="xavier"):
         """
         Initialize network weights using the specified method.
 
@@ -87,11 +90,11 @@ class MLP(nn.Module):
 
         for layer in self.network:
             if isinstance(layer, nn.Linear):
-                if method == 'xavier':
+                if method == "xavier":
                     nn.init.xavier_uniform_(layer.weight)
                     nn.init.zeros_(layer.bias)
-                elif method == 'kaiming':
-                    nn.init.kaiming_normal_(layer.weight, nonlinearity='relu')
+                elif method == "kaiming":
+                    nn.init.kaiming_normal_(layer.weight, nonlinearity="relu")
                     nn.init.zeros_(layer.bias)
                 else:
                     raise ValueError(f"Unsupported initialization method: {method}")
@@ -112,10 +115,7 @@ class MLP(nn.Module):
 # Example usage:
 if __name__ == "__main__":
     classical_config = MLPConfig(
-        hidden_sizes=[64, 32],
-        dropout=0.1,
-        activation='relu',
-        normalization='batch'
+        hidden_sizes=[64, 32], dropout=0.1, activation="relu", normalization="batch"
     )
 
     model = MLP(input_size=10, output_size=2, config=classical_config)

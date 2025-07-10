@@ -49,7 +49,7 @@ from importlib.metadata import metadata
 sys.path.insert(0, os.path.realpath("../"))
 
 
-merlinMetadata = metadata('merlinquantum')
+merlinMetadata = metadata("merlinquantum")
 
 REPO_PATH = Path(__file__).parent.parent.parent.resolve()
 
@@ -58,11 +58,11 @@ if not os.path.exists(build_directory):
     os.makedirs(build_directory)
 
 # -- Project information -----------------------------------------------------
-author = merlinMetadata['Author'].capitalize()
-project = merlinMetadata['Name']
+author = merlinMetadata["Author"].capitalize()
+project = merlinMetadata["Name"]
 copyright = f"{datetime.now().year}, {author}"
 
-release = merlinMetadata['Version']
+release = merlinMetadata["Version"]
 
 # -- General configuration ---------------------------------------------------
 
@@ -80,7 +80,7 @@ extensions = [
     "sphinx_multiversion",
 ]
 
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = ["autosectionlabel.*"]
 bibtex_bibfiles = ["references.bib"]
 bibtex_reference_style = "author_year"
 

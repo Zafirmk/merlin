@@ -15,11 +15,16 @@ class OutputMapper:
     """Handles mapping quantum probability distributions to classical outputs."""
 
     @staticmethod
-    def create_mapping(strategy: OutputMappingStrategy, input_size: int, output_size: int):
+    def create_mapping(
+        strategy: OutputMappingStrategy, input_size: int, output_size: int
+    ):
         """Create an output mapping based on strategy."""
         if strategy == OutputMappingStrategy.LINEAR:
             return nn.Linear(input_size, output_size)
-        elif strategy in [OutputMappingStrategy.GROUPING, OutputMappingStrategy.LEXGROUPING]:
+        elif strategy in [
+            OutputMappingStrategy.GROUPING,
+            OutputMappingStrategy.LEXGROUPING,
+        ]:
             return LexGroupingMapper(input_size, output_size)
         elif strategy == OutputMappingStrategy.MODGROUPING:
             return ModGroupingMapper(input_size, output_size)
@@ -44,7 +49,9 @@ class LexGroupingMapper(nn.Module):
 
     def forward(self, probability_distribution: torch.Tensor) -> torch.Tensor:
         """Group probability distribution into equal-sized buckets."""
-        pad_size = (self.output_size - (self.input_size % self.output_size)) % self.output_size
+        pad_size = (
+            self.output_size - (self.input_size % self.output_size)
+        ) % self.output_size
 
         if pad_size > 0:
             padded = F.pad(probability_distribution, (0, pad_size))
@@ -52,7 +59,9 @@ class LexGroupingMapper(nn.Module):
             padded = probability_distribution
 
         if probability_distribution.dim() == 2:
-            return padded.view(probability_distribution.shape[0], self.output_size, -1).sum(dim=-1)
+            return padded.view(
+                probability_distribution.shape[0], self.output_size, -1
+            ).sum(dim=-1)
         else:
             return padded.view(self.output_size, -1).sum(dim=-1)
 
@@ -82,30 +91,44 @@ class ModGroupingMapper(nn.Module):
 
         if probability_distribution.dim() == 2:
             batch_size = probability_distribution.shape[0]
-            result = torch.zeros(batch_size, self.output_size,
-                                 device=probability_distribution.device,
-                                 dtype=probability_distribution.dtype)
+            result = torch.zeros(
+                batch_size,
+                self.output_size,
+                device=probability_distribution.device,
+                dtype=probability_distribution.dtype,
+            )
             for b in range(batch_size):
-                result[b] = torch.zeros(self.output_size,
-                                        device=probability_distribution.device,
-                                        dtype=probability_distribution.dtype)
+                result[b] = torch.zeros(
+                    self.output_size,
+                    device=probability_distribution.device,
+                    dtype=probability_distribution.dtype,
+                )
                 result[b].index_add_(0, group_indices, probability_distribution[b])
             return result
         else:
-            result = torch.zeros(self.output_size,
-                                 device=probability_distribution.device,
-                                 dtype=probability_distribution.dtype)
+            result = torch.zeros(
+                self.output_size,
+                device=probability_distribution.device,
+                dtype=probability_distribution.dtype,
+            )
             result.index_add_(0, group_indices, probability_distribution)
             return result
+
+
 class FeatureEncoder:
     """Utility class for encoding classical features into quantum circuit parameters."""
 
     def __init__(self, feature_count: int):
         self.feature_count = feature_count
 
-    def encode(self, X_norm: torch.Tensor, circuit_type: CircuitType, n_modes: int,
-               bandwidth_coeffs: Optional[Dict[str, torch.Tensor]] = None,
-               total_shifters: Optional[int] = None) -> torch.Tensor:
+    def encode(
+        self,
+        X_norm: torch.Tensor,
+        circuit_type: CircuitType,
+        n_modes: int,
+        bandwidth_coeffs: Optional[Dict[str, torch.Tensor]] = None,
+        total_shifters: Optional[int] = None,
+    ) -> torch.Tensor:
         """Encode normalized features into quantum circuit parameters."""
         batch_size, num_features = X_norm.shape
 
@@ -133,11 +156,9 @@ class FeatureEncoder:
                 for m_idx in range(n_modes):
                     scale = get_scale(f"dim_{dim_idx}", m_idx)
                     multiplier = (m_idx + 1) * math.pi
-                    encoded = scale*multiplier * math.pi * X_norm[:, dim_idx]
+                    encoded = scale * multiplier * math.pi * X_norm[:, dim_idx]
                     cols.append(encoded.unsqueeze(1))
             return torch.cat(cols, dim=1)
-
-
 
         elif circuit_type == CircuitType.SERIES:
             cols = []
@@ -188,7 +209,6 @@ class FeatureEncoder:
             # Should have exactly max_subsets encodings, no padding needed
             return torch.cat(cols, dim=1)
 
-
         # PARALLEL: Direct feature-to-parameter mapping
         elif circuit_type == CircuitType.PARALLEL:
             if num_features == 1:
@@ -215,18 +235,21 @@ class SamplingProcess:
     def __init__(self):
         self.gradient_method = "exact"  # Always use exact for gradients
 
-    def pcvl_sampler(self, distribution: torch.Tensor, shots: int,
-                     method: str = 'multinomial') -> torch.Tensor:
+    def pcvl_sampler(
+        self, distribution: torch.Tensor, shots: int, method: str = "multinomial"
+    ) -> torch.Tensor:
         """Apply sampling noise to a probability distribution."""
         if shots <= 0:
             return distribution
 
         # Validate method
-        valid_methods = ['multinomial', 'binomial', 'gaussian']
+        valid_methods = ["multinomial", "binomial", "gaussian"]
         if method not in valid_methods:
-            raise ValueError(f"Invalid sampling method: {method}. Valid options are: {valid_methods}")
+            raise ValueError(
+                f"Invalid sampling method: {method}. Valid options are: {valid_methods}"
+            )
 
-        if method == 'multinomial':
+        if method == "multinomial":
             if distribution.dim() == 1:
                 sampled_counts = torch.multinomial(
                     distribution, num_samples=shots, replacement=True
@@ -248,10 +271,10 @@ class SamplingProcess:
                     noisy_dists.append(noisy_dist / shots)
                 return torch.stack(noisy_dists)
 
-        elif method == 'binomial':
+        elif method == "binomial":
             return torch.distributions.Binomial(shots, distribution).sample() / shots
 
-        elif method == 'gaussian':
+        elif method == "gaussian":
             std_dev = torch.sqrt(distribution * (1 - distribution) / shots)
             noise = torch.randn_like(distribution) * std_dev
             noisy_dist = distribution + noise

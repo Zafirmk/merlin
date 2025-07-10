@@ -322,8 +322,7 @@ class TestOutputMappingIntegration:
 
     def test_mapping_gradient_flow(self):
         """Test gradient flow through different mapping strategies."""
-        
-        
+
         experiment = ML.PhotonicBackend(
             circuit_type=ML.CircuitType.PARALLEL_COLUMNS, n_modes=6, n_photons=2
         )
@@ -346,7 +345,7 @@ class TestOutputMappingIntegration:
 
             x = torch.rand(2, 2, requires_grad=True)
             output = layer(x)
-            
+
             # Use MSE loss instead of sum for better gradient flow
             target = torch.ones_like(output)
             loss = F.mse_loss(output, target)
@@ -354,9 +353,9 @@ class TestOutputMappingIntegration:
 
             # Input should have gradients
             assert x.grad is not None, f"No gradients for strategy {strategy}"
-            assert not torch.allclose(
-                x.grad, torch.zeros_like(x.grad)
-            ), f"Zero gradients for strategy {strategy}"
+            assert not torch.allclose(x.grad, torch.zeros_like(x.grad)), (
+                f"Zero gradients for strategy {strategy}"
+            )
 
     def test_mapping_output_bounds(self):
         """Test that different mappings produce reasonable output bounds."""
@@ -494,6 +493,6 @@ class TestOutputMappingIntegration:
 
         # All outputs should be identical (deterministic)
         for i in range(1, len(outputs)):
-            assert torch.allclose(
-                outputs[0], outputs[i], atol=1e-6
-            ), f"Output {i} differs from output 0"
+            assert torch.allclose(outputs[0], outputs[i], atol=1e-6), (
+                f"Output {i} differs from output 0"
+            )

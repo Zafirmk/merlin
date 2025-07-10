@@ -17,6 +17,7 @@ from ..core.process import ComputationProcessFactory
 from ..core.photonicbackend import PhotonicBackend as Experiment
 from ..core.generators import CircuitType, StatePattern
 
+
 class QuantumLayer(nn.Module):
     """
     Enhanced Quantum Neural Network Layer with factory-based architecture.
@@ -32,25 +33,28 @@ class QuantumLayer(nn.Module):
             If None, photons can be placed in any mode from 0 to m-1.
     """
 
-    def __init__(self, input_size: int, output_size: Optional[int] = None,
-                 # Ansatz-based construction
-                 ansatz: Optional[Ansatz] = None,
-                 # Custom circuit construction (backward compatible)
-                 circuit: Optional[pcvl.Circuit] = None,
-                 input_state: Optional[List[int]] = None,
-                 n_photons: Optional[int] = None,
-                 trainable_parameters: List[str] = [],
-                 input_parameters: List[str] = [],
-                 # Common parameters
-                 output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-                 device: Optional[torch.device] = None,
-                 dtype: Optional[torch.dtype] = None,
-                 shots: int = 0,
-                 sampling_method: str = 'multinomial',
-                 no_bunching: bool = True,
-                 # New parameter for constrained photon placement
-                 index_photons: Optional[List[Tuple[int, int]]] = None):
-
+    def __init__(
+        self,
+        input_size: int,
+        output_size: Optional[int] = None,
+        # Ansatz-based construction
+        ansatz: Optional[Ansatz] = None,
+        # Custom circuit construction (backward compatible)
+        circuit: Optional[pcvl.Circuit] = None,
+        input_state: Optional[List[int]] = None,
+        n_photons: Optional[int] = None,
+        trainable_parameters: List[str] = [],
+        input_parameters: List[str] = [],
+        # Common parameters
+        output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+        shots: int = 0,
+        sampling_method: str = "multinomial",
+        no_bunching: bool = True,
+        # New parameter for constrained photon placement
+        index_photons: Optional[List[Tuple[int, int]]] = None,
+    ):
         super().__init__()
 
         self.device = device
@@ -64,8 +68,13 @@ class QuantumLayer(nn.Module):
             self._init_from_ansatz(ansatz, output_size, output_mapping_strategy)
         elif circuit is not None:
             self._init_from_custom_circuit(
-                circuit, input_state, n_photons, trainable_parameters,
-                input_parameters, output_size, output_mapping_strategy
+                circuit,
+                input_state,
+                n_photons,
+                trainable_parameters,
+                input_parameters,
+                output_size,
+                output_mapping_strategy,
             )
         else:
             raise ValueError("Either 'ansatz' or 'circuit' must be provided")
@@ -75,8 +84,12 @@ class QuantumLayer(nn.Module):
         self.shots = shots
         self.sampling_method = sampling_method
 
-    def _init_from_ansatz(self, ansatz: Ansatz, output_size: Optional[int],
-                          output_mapping_strategy: OutputMappingStrategy):
+    def _init_from_ansatz(
+        self,
+        ansatz: Ansatz,
+        output_size: Optional[int],
+        output_mapping_strategy: OutputMappingStrategy,
+    ):
         """Initialize from ansatz (auto-generated mode)."""
         self.ansatz = ansatz
         self.auto_generation_mode = True
@@ -93,7 +106,7 @@ class QuantumLayer(nn.Module):
                 device=self.device,
                 dtype=self.dtype,
                 no_bunching=self.no_bunching,
-                index_photons=self.index_photons
+                index_photons=self.index_photons,
             )
         else:
             # Use the ansatz's computation process as before
@@ -109,9 +122,16 @@ class QuantumLayer(nn.Module):
         if ansatz.experiment.use_bandwidth_tuning:
             self.bandwidth_coeffs = nn.ParameterDict()
             for d in range(self.input_size):
-                init = torch.linspace(0.0, 2.0, steps=ansatz.experiment.n_modes,
-                                      dtype=self.dtype, device=self.device)
-                self.bandwidth_coeffs[f"dim_{d}"] = nn.Parameter(init.clone(), requires_grad=True)
+                init = torch.linspace(
+                    0.0,
+                    2.0,
+                    steps=ansatz.experiment.n_modes,
+                    dtype=self.dtype,
+                    device=self.device,
+                )
+                self.bandwidth_coeffs[f"dim_{d}"] = nn.Parameter(
+                    init.clone(), requires_grad=True
+                )
         else:
             self.bandwidth_coeffs = None
 
@@ -121,10 +141,16 @@ class QuantumLayer(nn.Module):
         # Setup output mapping using ansatz configuration
         self._setup_output_mapping(ansatz, actual_output_size, actual_strategy)
 
-    def _init_from_custom_circuit(self, circuit: pcvl.Circuit, input_state: Optional[List[int]],
-                                  n_photons: Optional[int], trainable_parameters: List[str],
-                                  input_parameters: List[str], output_size: Optional[int],
-                                  output_mapping_strategy: OutputMappingStrategy):
+    def _init_from_custom_circuit(
+        self,
+        circuit: pcvl.Circuit,
+        input_state: Optional[List[int]],
+        n_photons: Optional[int],
+        trainable_parameters: List[str],
+        input_parameters: List[str],
+        output_size: Optional[int],
+        output_mapping_strategy: OutputMappingStrategy,
+    ):
         """Initialize from custom circuit (backward compatible mode)."""
         self.auto_generation_mode = False
         self.bandwidth_coeffs = None
@@ -138,7 +164,9 @@ class QuantumLayer(nn.Module):
         elif n_photons is not None:
             if self.index_photons is not None:
                 # Create input state respecting index_photons constraints
-                self.input_state = self._create_input_state_from_index_photons(n_photons, circuit.m)
+                self.input_state = self._create_input_state_from_index_photons(
+                    n_photons, circuit.m
+                )
             else:
                 # Default behavior: place photons in first n_photons modes
                 self.input_state = [1] * n_photons + [0] * (circuit.m - n_photons)
@@ -154,7 +182,7 @@ class QuantumLayer(nn.Module):
             device=self.device,
             dtype=self.dtype,
             no_bunching=self.no_bunching,
-            index_photons=self.index_photons
+            index_photons=self.index_photons,
         )
 
         # Setup parameters
@@ -185,7 +213,9 @@ class QuantumLayer(nn.Module):
                     )
                 photon_idx += 1
 
-    def _create_input_state_from_index_photons(self, n_photons: int, n_modes: int) -> List[int]:
+    def _create_input_state_from_index_photons(
+        self, n_photons: int, n_modes: int
+    ) -> List[int]:
         """Create input state respecting index_photons constraints."""
         if self.index_photons is None or len(self.index_photons) != n_photons:
             raise ValueError(
@@ -223,12 +253,13 @@ class QuantumLayer(nn.Module):
                     theta_list = spec_mappings[tp]
                     self.theta_names += theta_list
                     parameter = nn.Parameter(
-                        torch.randn((len(theta_list),), dtype=self.dtype, device=self.device) * torch.pi
+                        torch.randn(
+                            (len(theta_list),), dtype=self.dtype, device=self.device
+                        )
+                        * torch.pi
                     )
                     self.register_parameter(tp, parameter)
                     self.thetas.append(parameter)
-
-
 
     def _setup_parameters_from_custom(self, trainable_parameters: List[str]):
         """Setup parameters from custom circuit configuration."""
@@ -241,13 +272,20 @@ class QuantumLayer(nn.Module):
                 theta_list = spec_mappings[tp]
                 self.theta_names += theta_list
                 parameter = nn.Parameter(
-                    torch.randn((len(theta_list),), dtype=self.dtype, device=self.device) * torch.pi
+                    torch.randn(
+                        (len(theta_list),), dtype=self.dtype, device=self.device
+                    )
+                    * torch.pi
                 )
                 self.register_parameter(tp, parameter)
                 self.thetas.append(parameter)
 
-    def _setup_output_mapping(self, ansatz: Ansatz, output_size: Optional[int],
-                              output_mapping_strategy: OutputMappingStrategy):
+    def _setup_output_mapping(
+        self,
+        ansatz: Ansatz,
+        output_size: Optional[int],
+        output_mapping_strategy: OutputMappingStrategy,
+    ):
         """Setup output mapping for ansatz-based construction."""
         # Get distribution size
         dummy_params = self._create_dummy_parameters()
@@ -259,12 +297,17 @@ class QuantumLayer(nn.Module):
             if output_mapping_strategy == OutputMappingStrategy.NONE:
                 self.output_size = dist_size
             else:
-                raise ValueError("output_size must be specified for non-NONE strategies")
+                raise ValueError(
+                    "output_size must be specified for non-NONE strategies"
+                )
         else:
             self.output_size = output_size
 
         # Validate NONE strategy
-        if output_mapping_strategy == OutputMappingStrategy.NONE and self.output_size != dist_size:
+        if (
+            output_mapping_strategy == OutputMappingStrategy.NONE
+            and self.output_size != dist_size
+        ):
             raise ValueError(
                 f"Distribution size ({dist_size}) must equal output size ({self.output_size}) "
                 f"when using 'none' strategy"
@@ -276,11 +319,14 @@ class QuantumLayer(nn.Module):
         )
 
         # Ensure output mapping has correct dtype and device
-        if hasattr(self.output_mapping, 'weight'):
-            self.output_mapping = self.output_mapping.to(dtype=self.dtype, device=self.device)
+        if hasattr(self.output_mapping, "weight"):
+            self.output_mapping = self.output_mapping.to(
+                dtype=self.dtype, device=self.device
+            )
 
-    def _setup_output_mapping_from_custom(self, output_size: Optional[int],
-                                          output_mapping_strategy: OutputMappingStrategy):
+    def _setup_output_mapping_from_custom(
+        self, output_size: Optional[int], output_mapping_strategy: OutputMappingStrategy
+    ):
         """Setup output mapping for custom circuit construction."""
         # Get distribution size
         dummy_params = self._create_dummy_parameters()
@@ -292,7 +338,9 @@ class QuantumLayer(nn.Module):
             if output_mapping_strategy == OutputMappingStrategy.NONE:
                 self.output_size = dist_size
             else:
-                raise ValueError("output_size must be specified for non-NONE strategies")
+                raise ValueError(
+                    "output_size must be specified for non-NONE strategies"
+                )
         else:
             self.output_size = output_size
 
@@ -302,8 +350,10 @@ class QuantumLayer(nn.Module):
         )
 
         # Ensure output mapping has correct dtype and device
-        if hasattr(self.output_mapping, 'weight'):
-            self.output_mapping = self.output_mapping.to(dtype=self.dtype, device=self.device)
+        if hasattr(self.output_mapping, "weight"):
+            self.output_mapping = self.output_mapping.to(
+                dtype=self.dtype, device=self.device
+            )
 
     def _create_dummy_parameters(self) -> List[torch.Tensor]:
         """Create dummy parameters for initialization."""
@@ -311,7 +361,9 @@ class QuantumLayer(nn.Module):
 
         # Add dummy input parameters
         if self.auto_generation_mode:
-            dummy_input = torch.zeros(self.ansatz.total_shifters, dtype=self.dtype, device=self.device)
+            dummy_input = torch.zeros(
+                self.ansatz.total_shifters, dtype=self.dtype, device=self.device
+            )
             params.append(dummy_input)
         else:
             # For custom circuits, create dummy based on input parameter count
@@ -320,7 +372,9 @@ class QuantumLayer(nn.Module):
             for ip in input_params:
                 if ip in spec_mappings:
                     param_count = len(spec_mappings[ip])
-                    dummy_input = torch.zeros(param_count, dtype=self.dtype, device=self.device)
+                    dummy_input = torch.zeros(
+                        param_count, dtype=self.dtype, device=self.device
+                    )
                     params.append(dummy_input)
 
         return params
@@ -335,14 +389,15 @@ class QuantumLayer(nn.Module):
                 x_norm,
                 self.ansatz.experiment.circuit_type,
                 self.ansatz.experiment.n_modes,
-                self.bandwidth_coeffs
+                self.bandwidth_coeffs,
             )
         else:
             # For custom circuits, apply 2π scaling directly
             return x
 
-
-    def prepare_parameters(self, input_parameters: List[torch.Tensor]) -> List[torch.Tensor]:
+    def prepare_parameters(
+        self, input_parameters: List[torch.Tensor]
+    ) -> List[torch.Tensor]:
         """Prepare parameter list for circuit evaluation."""
         # Handle batching
         if input_parameters and input_parameters[0].dim() > 1:
@@ -363,9 +418,12 @@ class QuantumLayer(nn.Module):
 
         return params
 
-    def forward(self, *input_parameters: torch.Tensor,
-                apply_sampling: Optional[bool] = None,
-                shots: Optional[int] = None) -> torch.Tensor:
+    def forward(
+        self,
+        *input_parameters: torch.Tensor,
+        apply_sampling: Optional[bool] = None,
+        shots: Optional[int] = None,
+    ) -> torch.Tensor:
         """Forward pass through the quantum layer."""
         # Prepare parameters
         params = self.prepare_parameters(list(input_parameters))
@@ -374,7 +432,11 @@ class QuantumLayer(nn.Module):
         distribution = self.computation_process.compute(params)
 
         # Handle sampling
-        needs_gradient = self.training and torch.is_grad_enabled() and any(p.requires_grad for p in self.parameters())
+        needs_gradient = (
+            self.training
+            and torch.is_grad_enabled()
+            and any(p.requires_grad for p in self.parameters())
+        )
         apply_sampling, shots = self.autodiff_process.autodiff_backend(
             needs_gradient, apply_sampling or False, shots or self.shots
         )
@@ -387,29 +449,36 @@ class QuantumLayer(nn.Module):
         # Apply output mapping
         return self.output_mapping(distribution)
 
-    def set_sampling_config(self, shots: Optional[int] = None, method: Optional[str] = None):
+    def set_sampling_config(
+        self, shots: Optional[int] = None, method: Optional[str] = None
+    ):
         """Update sampling configuration."""
         if shots is not None:
             if not isinstance(shots, int) or shots < 0:
                 raise ValueError(f"shots must be a non-negative integer, got {shots}")
             self.shots = shots
         if method is not None:
-            valid_methods = ['multinomial', 'binomial', 'gaussian']
+            valid_methods = ["multinomial", "binomial", "gaussian"]
             if method not in valid_methods:
-                raise ValueError(f"Invalid sampling method: {method}. Valid options are: {valid_methods}")
+                raise ValueError(
+                    f"Invalid sampling method: {method}. Valid options are: {valid_methods}"
+                )
             self.sampling_method = method
 
     def to(self, *args, **kwargs):
-
         super().to(*args, **kwargs)
         # Manually move any additional tensors
-        device = kwargs.get('device', None)
+        device = kwargs.get("device", None)
         if device is None and len(args) > 0:
             device = args[0]
         if device is not None:
             self.device = device
-            self.computation_process.simulation_graph = self.computation_process.simulation_graph.to(self.dtype, device)
-            self.computation_process.converter = self.computation_process.converter.to(self.dtype, device)
+            self.computation_process.simulation_graph = (
+                self.computation_process.simulation_graph.to(self.dtype, device)
+            )
+            self.computation_process.converter = self.computation_process.converter.to(
+                self.dtype, device
+            )
         return self
 
     def get_index_photons_info(self) -> dict:
@@ -421,33 +490,40 @@ class QuantumLayer(nn.Module):
         """
         if self.index_photons is None:
             return {
-                'constrained': False,
-                'message': 'No photon placement constraints (photons can be placed in any mode)'
+                "constrained": False,
+                "message": "No photon placement constraints (photons can be placed in any mode)",
             }
 
         info = {
-            'constrained': True,
-            'n_photons': len(self.index_photons),
-            'constraints': []
+            "constrained": True,
+            "n_photons": len(self.index_photons),
+            "constraints": [],
         }
 
         for i, (min_mode, max_mode) in enumerate(self.index_photons):
-            info['constraints'].append({
-                'photon_index': i,
-                'allowed_modes': f'[{min_mode}, {max_mode}]',
-                'n_allowed_modes': max_mode - min_mode + 1
-            })
+            info["constraints"].append(
+                {
+                    "photon_index": i,
+                    "allowed_modes": f"[{min_mode}, {max_mode}]",
+                    "n_allowed_modes": max_mode - min_mode + 1,
+                }
+            )
 
         return info
 
     @classmethod
-    def simple(cls, input_size: int, n_params: int = 100,
-               shots: int = 0, reservoir_mode: bool = False,
-               output_size: Optional[int] = None,
-               output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.NONE,
-               device: Optional[torch.device] = None,
-               dtype: Optional[torch.dtype] = None,
-               no_bunching: bool = True):
+    def simple(
+        cls,
+        input_size: int,
+        n_params: int = 100,
+        shots: int = 0,
+        reservoir_mode: bool = False,
+        output_size: Optional[int] = None,
+        output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.NONE,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+        no_bunching: bool = True,
+    ):
         """
         Simplified interface for creating a QuantumLayer.
 
@@ -486,7 +562,7 @@ class QuantumLayer(nn.Module):
             n_photons=n_photons,
             reservoir_mode=reservoir_mode,
             use_bandwidth_tuning=False,  # Keep simple by default
-            state_pattern=StatePattern.PERIODIC  # Default to PERIODIC
+            state_pattern=StatePattern.PERIODIC,  # Default to PERIODIC
         )
 
         # Create ansatz using AnsatzFactory - NOW WITH no_bunching
@@ -497,7 +573,7 @@ class QuantumLayer(nn.Module):
             output_mapping_strategy=output_mapping_strategy,
             dtype=dtype,
             device=device,
-            no_bunching=no_bunching  # PASS no_bunching to ansatz
+            no_bunching=no_bunching,  # PASS no_bunching to ansatz
         )
 
         # IMPORTANT: Override the ansatz's output_mapping_strategy to ensure our parameter is used
@@ -513,18 +589,23 @@ class QuantumLayer(nn.Module):
             shots=shots,
             no_bunching=no_bunching,
             device=device,
-            dtype=dtype
+            dtype=dtype,
         )
+
     def __str__(self) -> str:
         """String representation of the quantum layer."""
         base_str = ""
         if self.auto_generation_mode:
-            base_str = f"QuantumLayer(ansatz={self.ansatz.experiment.circuit_type.value}, " \
-                       f"modes={self.ansatz.experiment.n_modes}, " \
-                       f"input_size={self.input_size}, output_size={self.output_size}"
+            base_str = (
+                f"QuantumLayer(ansatz={self.ansatz.experiment.circuit_type.value}, "
+                f"modes={self.ansatz.experiment.n_modes}, "
+                f"input_size={self.input_size}, output_size={self.output_size}"
+            )
         else:
-            base_str = f"QuantumLayer(custom_circuit, input_size={self.input_size}, " \
-                       f"output_size={self.output_size}"
+            base_str = (
+                f"QuantumLayer(custom_circuit, input_size={self.input_size}, "
+                f"output_size={self.output_size}"
+            )
 
         # Add index_photons info if present
         if self.index_photons is not None:

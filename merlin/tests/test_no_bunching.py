@@ -117,9 +117,9 @@ class TestNoBunchingFunctionality:
         actual_size = distribution.shape[-1]
 
         print(f"Full Fock space - Expected: {expected_size}, Actual: {actual_size}")
-        assert (
-            actual_size == expected_size
-        ), f"Expected Fock space size {expected_size}, got {actual_size}"
+        assert actual_size == expected_size, (
+            f"Expected Fock space size {expected_size}, got {actual_size}"
+        )
 
     def test_computation_process_with_no_bunching_true(self):
         """Test computation process with no_bunching=True (single photon states only)."""
@@ -160,9 +160,9 @@ class TestNoBunchingFunctionality:
         actual_size = distribution.shape[-1]
 
         print(f"No-bunching space - Expected: {expected_size}, Actual: {actual_size}")
-        assert (
-            actual_size == expected_size
-        ), f"Expected no-bunching size {expected_size}, got {actual_size}"
+        assert actual_size == expected_size, (
+            f"Expected no-bunching size {expected_size}, got {actual_size}"
+        )
 
     def test_quantum_layer_with_no_bunching_parameter(self):
         """Test QuantumLayer integration with no_bunching parameter."""
@@ -180,13 +180,14 @@ class TestNoBunchingFunctionality:
             )
 
             q_layer = QuantumLayer(
-                            input_size=2,
-                            circuit=circuit,
-                            input_state=input_state,
-                            trainable_parameters=["phi_"],
-                            input_parameters=["pl"],
-                            output_mapping_strategy=OutputMappingStrategy.NONE,
-                            no_bunching=no_bunching)
+                input_size=2,
+                circuit=circuit,
+                input_state=input_state,
+                trainable_parameters=["phi_"],
+                input_parameters=["pl"],
+                output_mapping_strategy=OutputMappingStrategy.NONE,
+                no_bunching=no_bunching,
+            )
 
             # Create dummy parameters
             dummy_params = q_layer._create_dummy_parameters()
@@ -369,7 +370,9 @@ class TestNoBunchingFunctionality:
 
         # Test for every test case
         for n_modes, n_photons in test_cases:
-            print(f"\nTesting compute_with_keys {n_photons} photons in {n_modes} modes:")
+            print(
+                f"\nTesting compute_with_keys {n_photons} photons in {n_modes} modes:"
+            )
             circuit, _ = CircuitGenerator.generate_circuit(
                 ML.CircuitType.SERIES, n_modes, 2
             )
@@ -396,7 +399,9 @@ class TestNoBunchingFunctionality:
             )
 
             spec_mappings_no_bunching = process_no_bunching.converter.spec_mappings
-            spec_mappings_full_fock_space = process_full_fock_space.converter.spec_mappings
+            spec_mappings_full_fock_space = (
+                process_full_fock_space.converter.spec_mappings
+            )
             dummy_params = []
 
             # Replace parameters by the same random values for the two circuits
@@ -405,16 +410,24 @@ class TestNoBunchingFunctionality:
                     param_count_n_b = len(spec_mappings_no_bunching[spec])
                     if spec in spec_mappings_full_fock_space:
                         param_count_f_f_s = len(spec_mappings_full_fock_space[spec])
-                        assert param_count_n_b == param_count_f_f_s, "Different circuits for no_bunching and full_fock_space"
+                        assert param_count_n_b == param_count_f_f_s, (
+                            "Different circuits for no_bunching and full_fock_space"
+                        )
                         dummy_params.append(torch.randn(param_count_f_f_s))
                     else:
-                        raise Exception("Different circuits for no_bunching and full_fock_space")
+                        raise Exception(
+                            "Different circuits for no_bunching and full_fock_space"
+                        )
                 else:
                     if spec in spec_mappings_full_fock_space:
-                        raise Exception("Different circuits for no_bunching and full_fock_space")
+                        raise Exception(
+                            "Different circuits for no_bunching and full_fock_space"
+                        )
 
             # Test compute_with_keys with no_bunching
-            keys_no_bunching, distribution_no_bunching = process_no_bunching.compute_with_keys(dummy_params)
+            keys_no_bunching, distribution_no_bunching = (
+                process_no_bunching.compute_with_keys(dummy_params)
+            )
 
             # Should have the same distribution size
             expected_size = calculate_no_bunching_size(n_modes, n_photons)
@@ -425,7 +438,9 @@ class TestNoBunchingFunctionality:
             print("Correct distribution and keys size with no_bunching")
 
             # Test compute_with_keys on full Fock space
-            keys_full_fock_space, distribution_full_fock_space = process_full_fock_space.compute_with_keys(dummy_params)
+            keys_full_fock_space, distribution_full_fock_space = (
+                process_full_fock_space.compute_with_keys(dummy_params)
+            )
 
             # Should have the same distribution size
             expected_size = calculate_fock_space_size(n_modes, n_photons)
@@ -448,14 +463,18 @@ class TestNoBunchingFunctionality:
                     new_keys[index] = key
                     new_distribution[index] = proba
 
-            new_distribution = torch.tensor(new_distribution) / torch.sum(torch.tensor(new_distribution))
+            new_distribution = torch.tensor(new_distribution) / torch.sum(
+                torch.tensor(new_distribution)
+            )
 
             # new_distribution must be close to distribution_no_bunching
             assert torch.isclose(torch.sum(new_distribution), torch.tensor(1.0))
             assert torch.isclose(torch.sum(distribution_no_bunching), torch.tensor(1.0))
             assert new_keys == keys_no_bunching
             assert torch.allclose(new_distribution, distribution_no_bunching)
-            print("Convertion from distribution_full_fock_space to distribution_no_bunching completed successfully")
+            print(
+                "Convertion from distribution_full_fock_space to distribution_no_bunching completed successfully"
+            )
 
 
 if __name__ == "__main__":

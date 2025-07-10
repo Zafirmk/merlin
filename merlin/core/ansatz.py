@@ -16,12 +16,16 @@ from ..core.process import ComputationProcessFactory
 class Ansatz:
     """Complete configuration for a quantum neural network layer."""
 
-    def __init__(self, PhotonicBackend: PhotonicBackend, input_size: int,
-                 output_size: Optional[int] = None,
-                 output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-                 device: Optional[torch.device] = None,
-                 dtype: Optional[torch.dtype] = None,
-                 no_bunching: bool = True):  # ADD no_bunching parameter
+    def __init__(
+        self,
+        PhotonicBackend: PhotonicBackend,
+        input_size: int,
+        output_size: Optional[int] = None,
+        output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+        no_bunching: bool = True,
+    ):  # ADD no_bunching parameter
         self.experiment = PhotonicBackend
         self.input_size = input_size
         self.output_size = output_size
@@ -38,13 +42,13 @@ class Ansatz:
             PhotonicBackend.circuit_type,
             PhotonicBackend.n_modes,
             input_size,
-            reservoir_mode=PhotonicBackend.reservoir_mode
+            reservoir_mode=PhotonicBackend.reservoir_mode,
         )
 
         self.input_state = StateGenerator.generate_state(
             PhotonicBackend.n_modes,
             PhotonicBackend.n_photons,
-            PhotonicBackend.state_pattern
+            PhotonicBackend.state_pattern,
         )
 
         # Setup parameter patterns
@@ -59,7 +63,7 @@ class Ansatz:
             self.trainable_parameters = []
         else:
             # Only add phi_ if the circuit actually has phi_ parameters
-            has_phi_params = any(p.name.startswith('phi_') for p in circuit_params)
+            has_phi_params = any(p.name.startswith("phi_") for p in circuit_params)
             self.trainable_parameters = ["phi_"] if has_phi_params else []
 
         # Create computation process with proper dtype
@@ -81,7 +85,7 @@ class Ansatz:
             reservoir_mode=PhotonicBackend.reservoir_mode,
             no_bunching=self.no_bunching,  # PASS no_bunching here
             dtype=self.dtype,
-            device=self.device
+            device=self.device,
         )
 
 
@@ -89,12 +93,15 @@ class AnsatzFactory:
     """Factory for creating quantum layer ansatzes (complete configurations)."""
 
     @staticmethod
-    def create(PhotonicBackend: PhotonicBackend, input_size: int,
-               output_size: Optional[int] = None,
-               output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-               device: Optional[torch.device] = None,
-               dtype: Optional[torch.dtype] = None,
-               no_bunching: bool = True) -> Ansatz:  # ADD no_bunching parameter
+    def create(
+        PhotonicBackend: PhotonicBackend,
+        input_size: int,
+        output_size: Optional[int] = None,
+        output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
+        device: Optional[torch.device] = None,
+        dtype: Optional[torch.dtype] = None,
+        no_bunching: bool = True,
+    ) -> Ansatz:  # ADD no_bunching parameter
         """Create a complete ansatz configuration."""
         return Ansatz(
             PhotonicBackend=PhotonicBackend,
@@ -103,5 +110,5 @@ class AnsatzFactory:
             output_mapping_strategy=output_mapping_strategy,
             device=device,
             dtype=dtype,
-            no_bunching=no_bunching  # PASS it through
+            no_bunching=no_bunching,  # PASS it through
         )

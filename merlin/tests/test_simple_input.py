@@ -5,7 +5,10 @@ Test file specifically for output mapping strategies in QuantumLayer.simple()
 import torch
 import pytest
 import math
-from merlin import QuantumLayer, OutputMappingStrategy  # Replace with actual import path
+from merlin import (
+    QuantumLayer,
+    OutputMappingStrategy,
+)  # Replace with actual import path
 
 
 class TestOutputMappingStrategies:
@@ -20,7 +23,7 @@ class TestOutputMappingStrategies:
         layer = QuantumLayer.simple(
             input_size=3,
             n_params=100,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
 
         print(f"Input size: {layer.input_size}")
@@ -48,7 +51,7 @@ class TestOutputMappingStrategies:
         temp_layer = QuantumLayer.simple(
             input_size=3,
             n_params=100,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
         dist_size = temp_layer.output_size
         print(f"Distribution size: {dist_size}")
@@ -58,7 +61,7 @@ class TestOutputMappingStrategies:
             input_size=3,
             n_params=100,
             output_size=dist_size,  # Explicitly set to match distribution
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
 
         print(f"Created layer with output_size={dist_size}")
@@ -81,7 +84,7 @@ class TestOutputMappingStrategies:
                 input_size=3,
                 n_params=100,
                 output_size=10,  # Arbitrary size that won't match distribution
-                output_mapping_strategy=OutputMappingStrategy.NONE
+                output_mapping_strategy=OutputMappingStrategy.NONE,
             )
 
         print(f"Expected error: {exc_info.value}")
@@ -97,7 +100,7 @@ class TestOutputMappingStrategies:
             input_size=3,
             n_params=100,
             output_size=10,
-            output_mapping_strategy=OutputMappingStrategy.LINEAR
+            output_mapping_strategy=OutputMappingStrategy.LINEAR,
         )
 
         print(f"Input size: {layer.input_size}")
@@ -123,7 +126,7 @@ class TestOutputMappingStrategies:
             _layer = QuantumLayer.simple(
                 input_size=3,
                 n_params=100,
-                output_mapping_strategy=OutputMappingStrategy.LINEAR
+                output_mapping_strategy=OutputMappingStrategy.LINEAR,
             )
 
         print(f"Expected error: {exc_info.value}")
@@ -136,8 +139,9 @@ class TestOutputMappingStrategies:
 
         # Check the default in the method signature
         import inspect
+
         sig = inspect.signature(QuantumLayer.simple)
-        default_strategy = sig.parameters['output_mapping_strategy'].default
+        default_strategy = sig.parameters["output_mapping_strategy"].default
 
         print(f"Default strategy: {default_strategy}")
         assert default_strategy == OutputMappingStrategy.NONE
@@ -151,7 +155,7 @@ class TestOutputMappingStrategies:
             input_size=3,
             n_params=100,
             output_size=10,
-            output_mapping_strategy=OutputMappingStrategy.LINEAR
+            output_mapping_strategy=OutputMappingStrategy.LINEAR,
         )
 
         # Check that ansatz has the correct strategy after override
@@ -176,7 +180,7 @@ class TestOutputMappingStrategies:
             layer = QuantumLayer.simple(
                 input_size=input_size,
                 n_params=n_params,
-                output_mapping_strategy=OutputMappingStrategy.NONE
+                output_mapping_strategy=OutputMappingStrategy.NONE,
             )
 
             n_modes = layer.ansatz.experiment.n_modes
@@ -188,6 +192,7 @@ class TestOutputMappingStrategies:
             # Distribution size should be combinatorial based on modes and photons
             # For no_bunching=True, it's C(n_modes, n_photons)
             from math import comb
+
             expected_dist_size = comb(n_modes, input_size)
 
             # Note: The actual distribution size might be different due to
@@ -204,7 +209,7 @@ class TestOutputMappingStrategies:
             n_params=100,
             output_size=5,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
-            reservoir_mode=False
+            reservoir_mode=False,
         )
 
         x = torch.rand(10, 3, requires_grad=True)
@@ -213,8 +218,10 @@ class TestOutputMappingStrategies:
         loss.backward()
 
         # Check gradients exist
-        has_grad = any(p.grad is not None and not torch.all(p.grad == 0)
-                       for p in layer_linear.parameters())
+        has_grad = any(
+            p.grad is not None and not torch.all(p.grad == 0)
+            for p in layer_linear.parameters()
+        )
         assert has_grad
         print("✓ Gradients flow correctly with LINEAR strategy")
 
@@ -223,7 +230,7 @@ class TestOutputMappingStrategies:
             input_size=3,
             n_params=100,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            reservoir_mode=False
+            reservoir_mode=False,
         )
 
         x = torch.rand(10, 3, requires_grad=True)
@@ -231,8 +238,10 @@ class TestOutputMappingStrategies:
         loss = output.sum()
         loss.backward()
 
-        has_grad = any(p.grad is not None and not torch.all(p.grad == 0)
-                       for p in layer_none.parameters())
+        has_grad = any(
+            p.grad is not None and not torch.all(p.grad == 0)
+            for p in layer_none.parameters()
+        )
         assert has_grad
         print("✓ Gradients flow correctly with NONE strategy")
 
@@ -249,7 +258,7 @@ class TestOutputMappingStrategies:
             layer = QuantumLayer.simple(
                 input_size=input_size,
                 n_params=100,
-                output_mapping_strategy=OutputMappingStrategy.NONE
+                output_mapping_strategy=OutputMappingStrategy.NONE,
             )
 
             # Get info about the layer
@@ -257,7 +266,9 @@ class TestOutputMappingStrategies:
             n_photons = layer.ansatz.experiment.n_photons
             dist_size = layer.output_size
 
-            print(f"  n_modes: {n_modes}, n_photons: {n_photons}, dist_size: {dist_size}")
+            print(
+                f"  n_modes: {n_modes}, n_photons: {n_photons}, dist_size: {dist_size}"
+            )
 
             # Test forward pass with different batch sizes
             for batch_size in [1, 5, 10]:
@@ -266,7 +277,9 @@ class TestOutputMappingStrategies:
 
                 assert output.shape == (batch_size, dist_size)
                 # Check probability distribution sums to 1
-                assert torch.allclose(output.sum(dim=1), torch.ones(batch_size), atol=1e-5)
+                assert torch.allclose(
+                    output.sum(dim=1), torch.ones(batch_size), atol=1e-5
+                )
 
             print("  ✓ Forward pass successful for all batch sizes")
 
@@ -283,13 +296,12 @@ class TestOutputMappingStrategies:
             layer = QuantumLayer.simple(
                 input_size=input_size,
                 n_params=n_params,
-                output_mapping_strategy=OutputMappingStrategy.NONE
+                output_mapping_strategy=OutputMappingStrategy.NONE,
             )
 
             # Calculate expected n_modes
             expected_n_modes = max(
-                int(math.ceil(math.sqrt(n_params / 2))),
-                input_size + 1
+                int(math.ceil(math.sqrt(n_params / 2))), input_size + 1
             )
 
             actual_n_modes = layer.ansatz.experiment.n_modes
@@ -316,7 +328,7 @@ class TestOutputMappingStrategies:
         layer1 = QuantumLayer.simple(
             input_size=1,
             n_params=10,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
         x1 = torch.rand(1, 1)
         output1 = layer1(x1)
@@ -328,7 +340,7 @@ class TestOutputMappingStrategies:
         layer2 = QuantumLayer.simple(
             input_size=10,
             n_params=120,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
         x2 = torch.rand(1, 20)
         output2 = layer2(x2)
@@ -341,13 +353,12 @@ class TestOutputMappingStrategies:
         layer3 = QuantumLayer.simple(
             input_size=10,
             n_params=10,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
         # Should use input_size + 1 = 11 modes
         assert layer3.ansatz.experiment.n_modes >= 11
         print(f"  n_modes: {layer3.ansatz.experiment.n_modes}")
         print("  ✓ Correctly uses max(calculated, input_size+1)")
-
 
     def test_none_mapping_with_reservoir_mode(self):
         """Test NONE mapping with reservoir mode."""
@@ -357,14 +368,13 @@ class TestOutputMappingStrategies:
             input_size=4,
             n_params=100,
             reservoir_mode=True,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
 
         # Check that no trainable parameters exist
         trainable_params = list(layer.parameters())
         assert len(trainable_params) == 0
         print("  ✓ No trainable parameters in reservoir mode")
-
 
         # Test forward pass
         x = torch.rand(3, 4)
@@ -386,7 +396,7 @@ class TestOutputMappingStrategies:
                 input_size=3,
                 n_params=100,
                 dtype=dtype,
-                output_mapping_strategy=OutputMappingStrategy.NONE
+                output_mapping_strategy=OutputMappingStrategy.NONE,
             )
 
             # Check parameter dtypes
@@ -407,7 +417,7 @@ class TestOutputMappingStrategies:
         layer = QuantumLayer.simple(
             input_size=3,
             n_params=100,
-            output_mapping_strategy=OutputMappingStrategy.NONE
+            output_mapping_strategy=OutputMappingStrategy.NONE,
         )
 
         batch_sizes = [1, 10, 32]

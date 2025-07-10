@@ -80,7 +80,9 @@ REPO_PATH = Path(__file__).parent.parent.parent.resolve()
 
 repo = Repo(REPO_PATH)
 tags = [tag.name for tag in repo.tags]
-versions = keep_latest_versions(tags, "v0.1")  # TODO: update the version if necessary (PML-29)
+versions = keep_latest_versions(
+    tags, "v0.1"
+)  # TODO: update the version if necessary (PML-29)
 versions_string = "".join([f"({one_version})|" for one_version in versions])[:-1]
 versions_regex = re.compile(f"^{versions_string}$")
 

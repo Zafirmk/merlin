@@ -8,11 +8,19 @@ from .base import AbstractComputationProcess
 from .process import ComputationProcess, ComputationProcessFactory
 from .generators import CircuitType, StatePattern, CircuitGenerator, StateGenerator
 
-__all__ = ["QuantumLayer", "PhotonicBackend", "Ansatz", "AnsatzFactory", "AbstractComputationProcess", "ComputationProcess", "ComputationProcessFactory", "CircuitType", "StatePattern", "CircuitGenerator", "StateGenerator"]
-
-
-
-
+__all__ = [
+    "QuantumLayer",
+    "PhotonicBackend",
+    "Ansatz",
+    "AnsatzFactory",
+    "AbstractComputationProcess",
+    "ComputationProcess",
+    "ComputationProcessFactory",
+    "CircuitType",
+    "StatePattern",
+    "CircuitGenerator",
+    "StateGenerator",
+]
 
 
 # merlin/tests/__init__.py

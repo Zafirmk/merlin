@@ -11,18 +11,21 @@ class SamplingProcess:
     def __init__(self):
         self.gradient_method = "exact"  # Always use exact for gradients
 
-    def pcvl_sampler(self, distribution: torch.Tensor, shots: int,
-                     method: str = 'multinomial') -> torch.Tensor:
+    def pcvl_sampler(
+        self, distribution: torch.Tensor, shots: int, method: str = "multinomial"
+    ) -> torch.Tensor:
         """Apply sampling noise to a probability distribution."""
         if shots <= 0:
             return distribution
 
         # Validate method
-        valid_methods = ['multinomial', 'binomial', 'gaussian']
+        valid_methods = ["multinomial", "binomial", "gaussian"]
         if method not in valid_methods:
-            raise ValueError(f"Invalid sampling method: {method}. Valid options are: {valid_methods}")
+            raise ValueError(
+                f"Invalid sampling method: {method}. Valid options are: {valid_methods}"
+            )
 
-        if method == 'multinomial':
+        if method == "multinomial":
             if distribution.dim() == 1:
                 sampled_counts = torch.multinomial(
                     distribution, num_samples=shots, replacement=True
@@ -44,10 +47,10 @@ class SamplingProcess:
                     noisy_dists.append(noisy_dist / shots)
                 return torch.stack(noisy_dists)
 
-        elif method == 'binomial':
+        elif method == "binomial":
             return torch.distributions.Binomial(shots, distribution).sample() / shots
 
-        elif method == 'gaussian':
+        elif method == "gaussian":
             std_dev = torch.sqrt(distribution * (1 - distribution) / shots)
             noise = torch.randn_like(distribution) * std_dev
             noisy_dist = distribution + noise

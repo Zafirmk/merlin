@@ -13,6 +13,7 @@ from merlin.core.photonicbackend import PhotonicBackend as Experiment
 from merlin.core.generators import CircuitType, StatePattern
 from merlin.sampling.strategies import OutputMappingStrategy
 
+
 class TestNoBunchingViaAnsatz:
     """Test suite for no_bunching parameter through ansatz route."""
 
@@ -25,7 +26,7 @@ class TestNoBunchingViaAnsatz:
             n_photons=2,
             reservoir_mode=False,
             use_bandwidth_tuning=False,
-            state_pattern=StatePattern.PERIODIC
+            state_pattern=StatePattern.PERIODIC,
         )
 
     def test_ansatz_factory_propagates_no_bunching(self, basic_experiment):
@@ -37,8 +38,8 @@ class TestNoBunchingViaAnsatz:
             output_size=4,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
             dtype=torch.float32,
-            device=torch.device('cpu'),
-            no_bunching=True
+            device=torch.device("cpu"),
+            no_bunching=True,
         )
 
         # Test with no_bunching=False
@@ -48,14 +49,18 @@ class TestNoBunchingViaAnsatz:
             output_size=4,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
             dtype=torch.float32,
-            device=torch.device('cpu'),
-            no_bunching=False
+            device=torch.device("cpu"),
+            no_bunching=False,
         )
 
         # Verify that computation processes have different state space sizes
         # When no_bunching=True, states with multiple photons in one mode are excluded
-        assert hasattr(ansatz_true, 'computation_process'), "Ansatz should have computation_process"
-        assert hasattr(ansatz_false, 'computation_process'), "Ansatz should have computation_process"
+        assert hasattr(ansatz_true, "computation_process"), (
+            "Ansatz should have computation_process"
+        )
+        assert hasattr(ansatz_false, "computation_process"), (
+            "Ansatz should have computation_process"
+        )
 
         # The actual verification would depend on internal implementation
         # Here we're checking that the ansatz objects are created successfully
@@ -71,16 +76,13 @@ class TestNoBunchingViaAnsatz:
             output_size=4,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
             dtype=torch.float32,
-            device=torch.device('cpu'),
-            no_bunching=True
+            device=torch.device("cpu"),
+            no_bunching=True,
         )
 
         # Create QuantumLayer from ansatz
         layer = QuantumLayer(
-            input_size=2,
-            output_size=4,
-            ansatz=ansatz,
-            no_bunching=True
+            input_size=2, output_size=4, ansatz=ansatz, no_bunching=True
         )
 
         # Verify layer is created and has correct no_bunching setting
@@ -90,18 +92,10 @@ class TestNoBunchingViaAnsatz:
     def test_simple_method_propagates_no_bunching(self):
         """Test that QuantumLayer.simple() correctly propagates no_bunching."""
         # Test with no_bunching=True (default)
-        layer_true = QuantumLayer.simple(
-            input_size=3,
-            n_params=50,
-            no_bunching=True
-        )
+        layer_true = QuantumLayer.simple(input_size=3, n_params=50, no_bunching=True)
 
         # Test with no_bunching=False
-        layer_false = QuantumLayer.simple(
-            input_size=3,
-            n_params=50,
-            no_bunching=False
-        )
+        layer_false = QuantumLayer.simple(input_size=3, n_params=50, no_bunching=False)
 
         # Verify both layers are created successfully
         assert layer_true.no_bunching
@@ -133,7 +127,7 @@ class TestNoBunchingViaAnsatz:
             n_params=20,
             output_size=None,  # Use full distribution
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=True
+            no_bunching=True,
         )
 
         layer_with_bunch = QuantumLayer.simple(
@@ -141,7 +135,7 @@ class TestNoBunchingViaAnsatz:
             n_params=20,
             output_size=None,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=False
+            no_bunching=False,
         )
 
         # Same input
@@ -153,8 +147,9 @@ class TestNoBunchingViaAnsatz:
 
         # The distributions should have different sizes
         # no_bunching=False allows more states
-        assert dist_with_bunch.shape[-1] >= dist_no_bunch.shape[-1], \
+        assert dist_with_bunch.shape[-1] >= dist_no_bunch.shape[-1], (
             "Distribution with bunching should have at least as many states"
+        )
 
     def test_no_bunching_with_different_circuit_types(self):
         """Test no_bunching with different circuit types."""
@@ -167,7 +162,7 @@ class TestNoBunchingViaAnsatz:
                 n_photons=2,
                 reservoir_mode=False,
                 use_bandwidth_tuning=False,
-                state_pattern=StatePattern.PERIODIC
+                state_pattern=StatePattern.PERIODIC,
             )
 
             ansatz = AnsatzFactory.create(
@@ -175,14 +170,11 @@ class TestNoBunchingViaAnsatz:
                 input_size=2,
                 output_size=3,
                 output_mapping_strategy=OutputMappingStrategy.LINEAR,
-                no_bunching=True
+                no_bunching=True,
             )
 
             layer = QuantumLayer(
-                input_size=2,
-                output_size=3,
-                ansatz=ansatz,
-                no_bunching=True
+                input_size=2, output_size=3, ansatz=ansatz, no_bunching=True
             )
 
             # Test forward pass
@@ -199,7 +191,7 @@ class TestNoBunchingViaAnsatz:
             n_photons=3,
             reservoir_mode=True,  # Enable reservoir mode
             use_bandwidth_tuning=False,
-            state_pattern=StatePattern.PERIODIC
+            state_pattern=StatePattern.PERIODIC,
         )
 
         ansatz = AnsatzFactory.create(
@@ -207,14 +199,11 @@ class TestNoBunchingViaAnsatz:
             input_size=3,
             output_size=2,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
-            no_bunching=True
+            no_bunching=True,
         )
 
         layer = QuantumLayer(
-            input_size=3,
-            output_size=2,
-            ansatz=ansatz,
-            no_bunching=True
+            input_size=3, output_size=2, ansatz=ansatz, no_bunching=True
         )
 
         # In reservoir mode, quantum parameters should be fixed
@@ -236,7 +225,7 @@ class TestNoBunchingViaAnsatz:
             n_params=30,
             output_size=2,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
-            no_bunching=True
+            no_bunching=True,
         )
 
         # Create simple loss function
@@ -255,7 +244,6 @@ class TestNoBunchingViaAnsatz:
             if param.requires_grad:
                 assert param.grad is not None, f"Parameter {name} should have gradients"
 
-
     def test_no_bunching_state_validation(self):
         """Test that no_bunching correctly validates quantum states."""
         # Create a scenario where we can check state space
@@ -265,7 +253,7 @@ class TestNoBunchingViaAnsatz:
             n_photons=2,
             reservoir_mode=False,
             use_bandwidth_tuning=False,
-            state_pattern=StatePattern.PERIODIC
+            state_pattern=StatePattern.PERIODIC,
         )
 
         # With no_bunching=True, states like |2,0,0⟩ should be excluded
@@ -275,14 +263,10 @@ class TestNoBunchingViaAnsatz:
             input_size=2,
             output_size=None,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=True
+            no_bunching=True,
         )
 
-        layer = QuantumLayer(
-            input_size=2,
-            ansatz=ansatz,
-            no_bunching=True
-        )
+        layer = QuantumLayer(input_size=2, ansatz=ansatz, no_bunching=True)
 
         # Get output distribution
         x = torch.zeros(1, 2)  # Simple input
@@ -291,15 +275,19 @@ class TestNoBunchingViaAnsatz:
         # Check that output dimension matches expected state space
         # For 2 photons in 3 modes with no bunching: C(3,2) = 3 states
         expected_states = 3
-        assert output.shape[-1] == expected_states, \
+        assert output.shape[-1] == expected_states, (
             f"Expected {expected_states} states, got {output.shape[-1]}"
+        )
 
-    @pytest.mark.parametrize("n_photons,n_modes,expected_states", [
-        (2, 3, 3),  # C(3,2) = 3
-        (2, 4, 6),  # C(4,2) = 6
-        (3, 4, 4),  # C(4,3) = 4
-        (3, 5, 10),  # C(5,3) = 10
-    ])
+    @pytest.mark.parametrize(
+        "n_photons,n_modes,expected_states",
+        [
+            (2, 3, 3),  # C(3,2) = 3
+            (2, 4, 6),  # C(4,2) = 6
+            (3, 4, 4),  # C(4,3) = 4
+            (3, 5, 10),  # C(5,3) = 10
+        ],
+    )
     def test_no_bunching_state_count(self, n_photons, n_modes, expected_states):
         """Test that no_bunching produces correct number of quantum states."""
         experiment = Experiment(
@@ -308,7 +296,7 @@ class TestNoBunchingViaAnsatz:
             n_photons=n_photons,
             reservoir_mode=False,
             use_bandwidth_tuning=False,
-            state_pattern=StatePattern.PERIODIC
+            state_pattern=StatePattern.PERIODIC,
         )
 
         ansatz = AnsatzFactory.create(
@@ -316,20 +304,17 @@ class TestNoBunchingViaAnsatz:
             input_size=n_photons,
             output_size=None,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=True
+            no_bunching=True,
         )
 
-        layer = QuantumLayer(
-            input_size=n_photons,
-            ansatz=ansatz,
-            no_bunching=True
-        )
+        layer = QuantumLayer(input_size=n_photons, ansatz=ansatz, no_bunching=True)
 
         x = torch.zeros(1, n_photons)
         output = layer(x)
 
-        assert output.shape[-1] == expected_states, \
+        assert output.shape[-1] == expected_states, (
             f"For {n_photons} photons in {n_modes} modes, expected {expected_states} states, got {output.shape[-1]}"
+        )
 
 
 class TestNoBunchingEdgeCases:
@@ -343,7 +328,7 @@ class TestNoBunchingEdgeCases:
             n_params=20,
             output_size=None,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=True
+            no_bunching=True,
         )
 
         layer_false = QuantumLayer.simple(
@@ -351,7 +336,7 @@ class TestNoBunchingEdgeCases:
             n_params=20,
             output_size=None,
             output_mapping_strategy=OutputMappingStrategy.NONE,
-            no_bunching=False
+            no_bunching=False,
         )
 
         x = torch.randn(1, 1)
@@ -360,8 +345,9 @@ class TestNoBunchingEdgeCases:
         output_true = layer_true(x)
         output_false = layer_false(x)
 
-        assert output_true.shape == output_false.shape, \
+        assert output_true.shape == output_false.shape, (
             "Single photon should produce same state space regardless of no_bunching"
+        )
 
     def test_no_bunching_with_bandwidth_tuning(self):
         """Test no_bunching with bandwidth tuning enabled."""
@@ -371,7 +357,7 @@ class TestNoBunchingEdgeCases:
             n_photons=2,
             reservoir_mode=False,
             use_bandwidth_tuning=True,  # Enable bandwidth tuning
-            state_pattern=StatePattern.PERIODIC
+            state_pattern=StatePattern.PERIODIC,
         )
 
         ansatz = AnsatzFactory.create(
@@ -379,18 +365,15 @@ class TestNoBunchingEdgeCases:
             input_size=2,
             output_size=3,
             output_mapping_strategy=OutputMappingStrategy.LINEAR,
-            no_bunching=True
+            no_bunching=True,
         )
 
         layer = QuantumLayer(
-            input_size=2,
-            output_size=3,
-            ansatz=ansatz,
-            no_bunching=True
+            input_size=2, output_size=3, ansatz=ansatz, no_bunching=True
         )
 
         # Check that bandwidth coefficients exist
-        assert hasattr(layer, 'bandwidth_coeffs')
+        assert hasattr(layer, "bandwidth_coeffs")
         assert layer.bandwidth_coeffs is not None
 
         # Test forward pass
@@ -404,11 +387,7 @@ class TestNoBunchingEdgeCases:
         import os
 
         # Create layer with no_bunching=True (using default NONE strategy)
-        layer = QuantumLayer.simple(
-            input_size=2,
-            n_params=30,
-            no_bunching=True
-        )
+        layer = QuantumLayer.simple(input_size=2, n_params=30, no_bunching=True)
 
         # Save state
         with tempfile.NamedTemporaryFile(delete=False) as tmp:
@@ -417,11 +396,7 @@ class TestNoBunchingEdgeCases:
 
         try:
             # Create new layer with same config
-            new_layer = QuantumLayer.simple(
-                input_size=2,
-                n_params=30,
-                no_bunching=True
-            )
+            new_layer = QuantumLayer.simple(input_size=2, n_params=30, no_bunching=True)
 
             # Load state
             new_layer.load_state_dict(torch.load(tmp_path))
@@ -433,10 +408,12 @@ class TestNoBunchingEdgeCases:
             torch.manual_seed(42)
             output2 = new_layer(x)
 
-            assert torch.allclose(output1, output2), \
+            assert torch.allclose(output1, output2), (
                 "Loaded layer should produce same output"
+            )
         finally:
             os.unlink(tmp_path)
+
 
 if __name__ == "__main__":
     # Run tests
