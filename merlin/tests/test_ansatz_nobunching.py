@@ -5,12 +5,10 @@ Test suite for no_bunching parameter through ansatz-based QuantumLayer construct
 import pytest
 import torch
 import torch.nn as nn
-import numpy as np
-from typing import List, Tuple
 
 # Assuming these imports based on the code structure
 from merlin.core.layer import QuantumLayer
-from merlin.core.ansatz import Ansatz, AnsatzFactory
+from merlin.core.ansatz import AnsatzFactory
 from merlin.core.photonicbackend import PhotonicBackend as Experiment
 from merlin.core.generators import CircuitType, StatePattern
 from merlin.sampling.strategies import OutputMappingStrategy
@@ -86,7 +84,7 @@ class TestNoBunchingViaAnsatz:
         )
 
         # Verify layer is created and has correct no_bunching setting
-        assert layer.no_bunching == True
+        assert layer.no_bunching
         assert layer.computation_process is not None
 
     def test_simple_method_propagates_no_bunching(self):
@@ -106,8 +104,8 @@ class TestNoBunchingViaAnsatz:
         )
 
         # Verify both layers are created successfully
-        assert layer_true.no_bunching == True
-        assert layer_false.no_bunching == False
+        assert layer_true.no_bunching
+        assert not layer_false.no_bunching
 
         # Test forward pass
         x = torch.randn(10, 3)  # Batch of 10, input size 3

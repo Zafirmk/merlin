@@ -4,7 +4,6 @@ Main QuantumLayer implementation with bug fixes and index_photons support.
 
 import math
 from typing import List, Optional, Tuple
-import numpy as np
 import torch
 import torch.nn as nn
 import perceval as pcvl

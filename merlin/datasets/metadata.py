@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Any
 from datetime import datetime
-import json
 
 @dataclass
 class Normalization:
@@ -170,9 +169,9 @@ class DatasetMetadata:
         if self.subset:
             text.append(f"Subset: {self.subset}")
         text += [
-            f"\nDescription:",
+            "\nDescription:",
             self.description,
-            f"\nBasic Information:",
+            "\nBasic Information:",
             f"- Number of instances: {self.num_instances:,}",
             f"- Number of features: {self.num_features:,}",
         ]
@@ -206,7 +205,7 @@ class DatasetMetadata:
         if self.license:
             text.append(f"License: {self.license}")
         if self.citation:
-            text.append(f"\nCitation:")
+            text.append("\nCitation:")
             text.append(self.citation)
 
         return "\n".join(text)

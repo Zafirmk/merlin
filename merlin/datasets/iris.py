@@ -1,6 +1,8 @@
 from sklearn.datasets import load_iris
 from sklearn.preprocessing import MinMaxScaler
 from merlin.datasets import DatasetMetadata
+from sklearn.model_selection import train_test_split
+
 
 iris_data = load_iris()
 features = iris_data.data
@@ -10,7 +12,6 @@ labels = iris_data.target
 features = MinMaxScaler().fit_transform(features)
 
 # split train, test
-from sklearn.model_selection import train_test_split
 train_features, test_features, train_labels, test_labels = train_test_split(
     features, labels, train_size=0.8, random_state=123
 )

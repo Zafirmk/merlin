@@ -1,7 +1,5 @@
 import torch
-import torch.nn as nn
 import perceval as pcvl
-import matplotlib.pyplot as plt
 
 import time
 from pynvml_utils import nvidia_smi
@@ -10,7 +8,6 @@ import pynvml
 import os
 from torch.amp import GradScaler, autocast
 from merlin import QuantumLayer, OutputMappingStrategy
-import math
 import argparse
 
 parser = argparse.ArgumentParser(description="Test MerLin on your GPU !")
@@ -121,7 +118,7 @@ def benchmark_BS(MODES = 8, PHOTONS = 4, BS = 32, TYPE = torch.float32, set_hp =
 
     print("\n ----------------------------------------------- \n")
 
-    print(f"\n TRAINING IS STARTING \n")
+    print("\n TRAINING IS STARTING \n")
     ##########################################
     ### training loop to match the targets ###
     ##########################################
@@ -209,11 +206,11 @@ def benchmark_BS(MODES = 8, PHOTONS = 4, BS = 32, TYPE = torch.float32, set_hp =
     backward_time = sum(history_backward) / len(history_backward)
 
     dict_results =  {"Batch size": BS, "mode": MODES, "nb photons": PHOTONS, "avg memory": avg_memory_needed, "torch memory": avg_torch, "reserved memory": avg_reserved,
-            "nb photons": sum(input_state), "type": str(type), "hp": set_hp, "t_layer":t_end_layer,
+            "nb photons from input_state": sum(input_state), "type": str(type), "hp": set_hp, "t_layer":t_end_layer,
             "t forward": forward_time, "t backward": backward_time, "t_exp":t_exp}
     print(f"\n Final results: {dict_results}")
 
-    save_experiment_results(dict_results, filename = f'exp_MerlinRelease.json')
+    save_experiment_results(dict_results, filename = 'exp_MerlinRelease.json')
 
     print(f"\n --- \n Done for mode {MODES} with {PHOTONS} photons \n --- \n")
 
@@ -249,7 +246,7 @@ def save_experiment_results(results, filename='bunched_results.json'):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    assert args.photons <= args.modes // 2, f"You cannot have more photons than half the number of modes"
-    assert args.photons > 0, f"You need at least 1 photon !"
+    assert args.photons <= args.modes // 2, "You cannot have more photons than half the number of modes"
+    assert args.photons > 0, "You need at least 1 photon !"
 
     benchmark_BS(MODES=args.modes, PHOTONS = args.photons, BS = args.bs, TYPE = args.type, set_hp = args.hp)

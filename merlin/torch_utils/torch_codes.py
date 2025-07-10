@@ -1,15 +1,14 @@
 import torch
 from typing import Optional, Dict
 import math as math
+import torch.nn as nn
+import torch.nn.functional as F
 from ..core.generators import CircuitType
+from ..sampling.strategies import OutputMappingStrategy
 
 """
 Output mapping implementations for quantum-to-classical conversion.
 """
-
-import torch.nn as nn
-import torch.nn.functional as F
-from ..sampling.strategies import OutputMappingStrategy
 
 
 class OutputMapper:

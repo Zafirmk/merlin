@@ -36,6 +36,10 @@ class ComputationProcess(AbstractComputationProcess):
         self.index_photons = index_photons
 
         # Extract circuit parameters for graph building
+        if type(input_state) is dict:
+            input_state = list(input_state.keys())[0]
+
+        # Extract circuit parameters for graph building
         self.m = len(input_state)  # Number of modes
         self.n_photons = sum(input_state)  # Total number of photons
 

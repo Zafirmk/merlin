@@ -1,3 +1,25 @@
+# MIT License
+#
+# Copyright (c) 2025 Quandela
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 """
 Test suite for CircuitConverter function.
 
@@ -5,9 +27,9 @@ This module provides comprehensive tests for the circuit compilation and unitary
 functionality, including edge cases, error handling, and performance validation.
 """
 
+import perceval as pcvl
 import pytest
 import torch
-import perceval as pcvl
 
 # Import the function under test
 from merlin import CircuitConverter
@@ -19,11 +41,7 @@ class TestBuildCircuitUnitaryComputegraph:
     def setup_method(self):
         """Set up test fixtures before each test method."""
         self.test_dtypes = [torch.float, torch.float64, torch.float16]
-        self.tolerance = {
-            torch.float: 1e-6,
-            torch.float64: 1e-12,
-            torch.float16: 1e-3
-        }
+        self.tolerance = {torch.float: 1e-6, torch.float64: 1e-12, torch.float16: 1e-3}
 
     def create_simple_circuit(self, n_modes: int = 2) -> pcvl.Circuit:
         """Create a simple test circuit with beam splitters and phase shifters."""
@@ -83,10 +101,12 @@ class TestBuildCircuitUnitaryComputegraph:
         assert torch.allclose(
             torch.matmul(unitary, unitary.conj().T),
             torch.eye(2, dtype=unitary.dtype),
-            atol=self.tolerance[torch.float]
+            atol=self.tolerance[torch.float],
         )
 
-    @pytest.mark.parametrize("dtype", [torch.float, torch.float64])  # Remove float16 due to ComplexHalf issues
+    @pytest.mark.parametrize(
+        "dtype", [torch.float, torch.float64]
+    )  # Remove float16 due to ComplexHalf issues
     def test_different_dtypes(self, dtype):
         """Test function with different data types."""
         circuit = self.create_simple_circuit()
@@ -99,7 +119,9 @@ class TestBuildCircuitUnitaryComputegraph:
         unitary = converter.to_tensor(phi_params)
 
         # Check output dtype
-        expected_complex_dtype = torch.complex64 if dtype != torch.float64 else torch.complex128
+        expected_complex_dtype = (
+            torch.complex64 if dtype != torch.float64 else torch.complex128
+        )
         assert unitary.dtype == expected_complex_dtype
 
         # Verify unitary property
@@ -129,7 +151,9 @@ class TestBuildCircuitUnitaryComputegraph:
             assert torch.allclose(product, identity, atol=self.tolerance[torch.float])
             if i > 0:
                 # Ensure different batches yield different unitaries
-                assert not torch.allclose(unitary, unitary_batch[0], atol=self.tolerance[torch.float])
+                assert not torch.allclose(
+                    unitary, unitary_batch[0], atol=self.tolerance[torch.float]
+                )
 
     def test_multiple_parameter_groups(self):
         """Test with multiple parameter groups."""
@@ -177,25 +201,24 @@ class TestBuildCircuitUnitaryComputegraph:
         input_specs = ["nonexistent"]  # This prefix doesn't match any parameters
 
         # This should raise an error because not all parameters are covered
-        with pytest.raises(ValueError, match="No parameters found matching the input spec 'nonexistent'"):
-            CircuitConverter(
-                circuit, input_specs, dtype=torch.float
-            )
+        with pytest.raises(
+            ValueError,
+            match="No parameters found matching the input spec 'nonexistent'",
+        ):
+            CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         input_specs = []
-        with pytest.raises(ValueError, match="Parameter 'phi1' not covered by any input spec"):
-            CircuitConverter(
-                circuit, input_specs, dtype=torch.float
-            )
+        with pytest.raises(
+            ValueError, match="Parameter 'phi1' not covered by any input spec"
+        ):
+            CircuitConverter(circuit, input_specs, dtype=torch.float)
 
     def test_subcircuit_handling(self):
         """Test circuits containing sub-circuits."""
         circuit = self.create_circuit_with_subcircuits()
         input_specs = ["sub", "main"]  # Use prefixes that match the parameters
 
-        converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float
-        )
+        converter = CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         # Test computation
         sub_phi_param = torch.tensor([0.1])  # For sub_phi parameter
@@ -210,9 +233,7 @@ class TestBuildCircuitUnitaryComputegraph:
         circuit = self.create_simple_circuit()
         input_specs = ["phi"]
 
-        converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float
-        )
+        converter = CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         # Test that the function works
         phi_params = torch.tensor([0.1, 0.2])
@@ -247,10 +268,7 @@ class TestBuildCircuitUnitaryComputegraph:
         input_specs = ["phi"]
 
         with pytest.raises(TypeError, match="Unsupported dtype"):
-            CircuitConverter(
-                circuit, input_specs, dtype=torch.int32
-            )
-
+            CircuitConverter(circuit, input_specs, dtype=torch.int32)
 
     @pytest.mark.parametrize("n_modes", [2, 3, 4, 6])
     def test_different_circuit_sizes(self, n_modes):
@@ -258,9 +276,7 @@ class TestBuildCircuitUnitaryComputegraph:
         circuit = self.create_complex_circuit(n_modes)
         input_specs = ["theta", "phi"]
 
-        converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float
-        )
+        converter = CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         # Test computation
         theta_params = torch.rand(n_modes)
@@ -281,7 +297,9 @@ class TestBuildCircuitUnitaryComputegraph:
         input_specs = ["phi"]
 
         converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float64  # Use higher precision
+            circuit,
+            input_specs,
+            dtype=torch.float64,  # Use higher precision
         )
 
         # Test with large parameter values
@@ -296,10 +314,14 @@ class TestBuildCircuitUnitaryComputegraph:
         identity = torch.eye(2, dtype=torch.complex128)
 
         product_large = torch.matmul(unitary_large, unitary_large.conj().T)
-        assert torch.allclose(product_large, identity, atol=self.tolerance[torch.float64])
+        assert torch.allclose(
+            product_large, identity, atol=self.tolerance[torch.float64]
+        )
 
         product_small = torch.matmul(unitary_small, unitary_small.conj().T)
-        assert torch.allclose(product_small, identity, atol=self.tolerance[torch.float64])
+        assert torch.allclose(
+            product_small, identity, atol=self.tolerance[torch.float64]
+        )
 
 
 class TestIntegration:
@@ -318,9 +340,7 @@ class TestIntegration:
 
         # Compile circuit
         input_specs = ["theta", "phi"]
-        converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float
-        )
+        converter = CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         # Use in training loop simulation
         theta_params = torch.tensor([0.1, 0.2], requires_grad=True)
@@ -329,7 +349,7 @@ class TestIntegration:
         optimizer = torch.optim.Adam([theta_params, phi_params], lr=0.01)
 
         # Simulate a few training steps
-        for step in range(5):
+        for _step in range(5):
             optimizer.zero_grad()
 
             unitary = converter.to_tensor(theta_params, phi_params)
@@ -350,9 +370,7 @@ class TestIntegration:
         circuit = self.create_medium_circuit()
         input_specs = ["theta"]
 
-        converter = CircuitConverter(
-            circuit, input_specs, dtype=torch.float
-        )
+        converter = CircuitConverter(circuit, input_specs, dtype=torch.float)
 
         # Warm up
         params = torch.rand(6)
@@ -361,6 +379,7 @@ class TestIntegration:
 
         # Time multiple runs
         import time
+
         n_runs = 100
 
         start_time = time.time()
