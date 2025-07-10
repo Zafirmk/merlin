@@ -1,37 +1,14 @@
-# MIT License
-#
-# Copyright (c) 2025 Quandela
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-import argparse
-import json
-import os
-import time
-
-import perceval as pcvl
-import pynvml
 import torch
-from pynvml_utils import nvidia_smi
-from torch.amp import GradScaler, autocast
+import perceval as pcvl
 
-from merlin import OutputMappingStrategy, QuantumLayer
+import time
+from pynvml_utils import nvidia_smi
+import json
+import pynvml
+import os
+from torch.amp import GradScaler, autocast
+from merlin import QuantumLayer, OutputMappingStrategy
+import argparse
 
 parser = argparse.ArgumentParser(description="Test MerLin on your GPU !")
 parser.add_argument(
@@ -78,7 +55,7 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
     """
 
     print(
-        f"\n Testing the GPU with a Batch size of {BS} for a circuit with {MODES} modes and {MODES//2} photons"
+        f"\n Testing the GPU with a Batch size of {BS} for a circuit with {MODES} modes and {MODES // 2} photons"
     )
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     if device == "cpu":
@@ -128,12 +105,12 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
         input_size=input_size,
         output_size=None,
         circuit=circuit,
-        input_state=input_state,
         trainable_parameters=[],
         input_parameters=["phase", "theta"],
+        input_state=input_state,
+        no_bunching=True,
         output_mapping_strategy=OutputMappingStrategy.NONE,
         device=device,
-        no_bunching=True,
     )
     print(f"Checking device of qlayer = {q_model.device}")
     t_end_layer = time.time() - t_start_layer
@@ -218,28 +195,25 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
         # t_backward = time.time()
         history_backward.append(t_backward - t_end_forward)
         history_forward.append(t_end_forward - t_start_epoch)
-        print(
-            f"\n --> Iteration {epoch + 1}/{N_EPOCHS}: " f"Loss = {loss.item():.4f}, "
-        )
+        print(f"\n --> Iteration {epoch + 1}/{N_EPOCHS}: Loss = {loss.item():.4f}, ")
 
         # memory monitoring
         nvsmi = nvidia_smi.getInstance()
         query_result = nvsmi.DeviceQuery("memory.free, memory.total")
-        total_used = 0
         for i, gpu_info in enumerate(query_result["gpu"]):
             total = gpu_info["fb_memory_usage"]["total"]
             free = gpu_info["fb_memory_usage"]["free"]
             used = total - free
-            total_used += used
             print(f"GPU {i}: {used} MB used out of {total} MB")
 
-        history_used.append(total_used)
+        history_used.append(used)
         torch_history.append(torch.cuda.memory_allocated() / (1024 * 1024))
         torch_reserved_history.append(torch.cuda.memory_reserved() / (1024 * 1024))
         print(
             f"Memory allocated for PyTorch "
             f"\n - allocated: {torch.cuda.memory_allocated() / (1024 * 1024):.2f} MB"
             f"\n - reserved: {torch.cuda.memory_reserved() / (1024 * 1024):.2f} MB"
+            f"\n - cached: {torch.cuda.memory_cached() / (1024 * 1024):.2f} MB"
         )
         pynvml.nvmlInit()
         handle = pynvml.nvmlDeviceGetHandleByIndex(0)
@@ -271,6 +245,7 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
         "avg memory": avg_memory_needed,
         "torch memory": avg_torch,
         "reserved memory": avg_reserved,
+        "nb photons from input_state": sum(input_state),
         "type": str(type),
         "hp": set_hp,
         "t_layer": t_end_layer,
@@ -297,7 +272,7 @@ def save_experiment_results(results, filename="bunched_results.json"):
     # Check if file exists and load existing data
     if os.path.exists(filename):
         try:
-            with open(filename) as file:
+            with open(filename, "r") as file:
                 all_results = json.load(file)
         except json.JSONDecodeError:
             # Handle case where file exists but is empty or corrupted
@@ -317,9 +292,9 @@ def save_experiment_results(results, filename="bunched_results.json"):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    assert (
-        args.photons <= args.modes // 2
-    ), "You cannot have more photons than half the number of modes"
+    assert args.photons <= args.modes // 2, (
+        "You cannot have more photons than half the number of modes"
+    )
     assert args.photons > 0, "You need at least 1 photon !"
 
     benchmark_BS(

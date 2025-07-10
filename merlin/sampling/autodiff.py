@@ -25,19 +25,19 @@ Automatic differentiation handling for sampling.
 """
 
 import warnings
-
+from typing import Tuple
 from .process import SamplingProcess
 
 
 class AutoDiffProcess:
     """Handles automatic differentiation backend and sampling noise integration."""
 
-    def __init__(self, sampling_method: str = "multinomial"):
-        self.sampling_noise = SamplingProcess(method=sampling_method)
+    def __init__(self):
+        self.sampling_noise = SamplingProcess()
 
     def autodiff_backend(
         self, needs_gradient: bool, apply_sampling: bool, shots: int
-    ) -> tuple[bool, int]:
+    ) -> Tuple[bool, int]:
         """Determine sampling configuration based on gradient requirements."""
         if needs_gradient and (apply_sampling or shots > 0):
             warnings.warn(

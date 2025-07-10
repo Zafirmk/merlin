@@ -24,7 +24,120 @@ import math as math
 
 import torch
 
+from typing import Optional, Dict
+import math as math
+import torch.nn as nn
+import torch.nn.functional as F
 from ..core.generators import CircuitType
+from ..sampling.strategies import OutputMappingStrategy
+
+"""
+Output mapping implementations for quantum-to-classical conversion.
+"""
+
+
+class OutputMapper:
+    """Handles mapping quantum probability distributions to classical outputs."""
+
+    @staticmethod
+    def create_mapping(
+        strategy: OutputMappingStrategy, input_size: int, output_size: int
+    ):
+        """Create an output mapping based on strategy."""
+        if strategy == OutputMappingStrategy.LINEAR:
+            return nn.Linear(input_size, output_size)
+        elif strategy in [
+            OutputMappingStrategy.GROUPING,
+            OutputMappingStrategy.LEXGROUPING,
+        ]:
+            return LexGroupingMapper(input_size, output_size)
+        elif strategy == OutputMappingStrategy.MODGROUPING:
+            return ModGroupingMapper(input_size, output_size)
+        elif strategy == OutputMappingStrategy.NONE:
+            if input_size != output_size:
+                raise ValueError(
+                    f"Distribution size ({input_size}) must equal "
+                    f"output size ({output_size}) when using 'none' strategy"
+                )
+            return nn.Identity()
+        else:
+            raise ValueError(f"Unknown output mapping strategy: {strategy}")
+
+
+class LexGroupingMapper(nn.Module):
+    """Maps probability distributions using lexicographical grouping."""
+
+    def __init__(self, input_size: int, output_size: int):
+        super().__init__()
+        self.input_size = input_size
+        self.output_size = output_size
+
+    def forward(self, probability_distribution: torch.Tensor) -> torch.Tensor:
+        """Group probability distribution into equal-sized buckets."""
+        pad_size = (
+            self.output_size - (self.input_size % self.output_size)
+        ) % self.output_size
+
+        if pad_size > 0:
+            padded = F.pad(probability_distribution, (0, pad_size))
+        else:
+            padded = probability_distribution
+
+        if probability_distribution.dim() == 2:
+            return padded.view(
+                probability_distribution.shape[0], self.output_size, -1
+            ).sum(dim=-1)
+        else:
+            return padded.view(self.output_size, -1).sum(dim=-1)
+
+
+class ModGroupingMapper(nn.Module):
+    """Maps probability distributions using modulo-based grouping."""
+
+    def __init__(self, input_size: int, output_size: int):
+        super().__init__()
+        self.input_size = input_size
+        self.output_size = output_size
+
+    def forward(self, probability_distribution: torch.Tensor) -> torch.Tensor:
+        """Group probability distribution based on indices modulo output_size."""
+        if self.output_size > self.input_size:
+            if probability_distribution.dim() == 2:
+                pad_size = self.output_size - self.input_size
+                padded = F.pad(probability_distribution, (0, pad_size))
+                return padded
+            else:
+                pad_size = self.output_size - self.input_size
+                padded = F.pad(probability_distribution, (0, pad_size))
+                return padded
+
+        indices = torch.arange(self.input_size, device=probability_distribution.device)
+        group_indices = indices % self.output_size
+
+        if probability_distribution.dim() == 2:
+            batch_size = probability_distribution.shape[0]
+            result = torch.zeros(
+                batch_size,
+                self.output_size,
+                device=probability_distribution.device,
+                dtype=probability_distribution.dtype,
+            )
+            for b in range(batch_size):
+                result[b] = torch.zeros(
+                    self.output_size,
+                    device=probability_distribution.device,
+                    dtype=probability_distribution.dtype,
+                )
+                result[b].index_add_(0, group_indices, probability_distribution[b])
+            return result
+        else:
+            result = torch.zeros(
+                self.output_size,
+                device=probability_distribution.device,
+                dtype=probability_distribution.dtype,
+            )
+            result.index_add_(0, group_indices, probability_distribution)
+            return result
 
 
 class FeatureEncoder:
@@ -36,11 +149,6 @@ class FeatureEncoder:
     """
 
     def __init__(self, feature_count: int):
-        """Initialize the feature encoder.
-
-        Args:
-            feature_count: Number of input features to encode
-        """
         self.feature_count = feature_count
 
     def encode(
@@ -171,3 +279,71 @@ class FeatureEncoder:
                 return torch.cat(cols, dim=1)
 
         raise ValueError(f"Unknown circuit type: {circuit_type}")
+
+
+class SamplingProcess:
+    """Handles quantum measurement sampling with different methods."""
+
+    def __init__(self):
+        self.gradient_method = "exact"  # Always use exact for gradients
+
+    def pcvl_sampler(
+        self, distribution: torch.Tensor, shots: int, method: str = "multinomial"
+    ) -> torch.Tensor:
+        """Apply sampling noise to a probability distribution."""
+        if shots <= 0:
+            return distribution
+
+        # Validate method
+        valid_methods = ["multinomial", "binomial", "gaussian"]
+        if method not in valid_methods:
+            raise ValueError(
+                f"Invalid sampling method: {method}. Valid options are: {valid_methods}"
+            )
+
+        if method == "multinomial":
+            if distribution.dim() == 1:
+                sampled_counts = torch.multinomial(
+                    distribution, num_samples=shots, replacement=True
+                )
+                noisy_dist = torch.zeros_like(distribution)
+                for idx in sampled_counts:
+                    noisy_dist[idx] += 1
+                return noisy_dist / shots
+            else:
+                batch_size = distribution.shape[0]
+                noisy_dists = []
+                for i in range(batch_size):
+                    sampled_counts = torch.multinomial(
+                        distribution[i], num_samples=shots, replacement=True
+                    )
+                    noisy_dist = torch.zeros_like(distribution[i])
+                    for idx in sampled_counts:
+                        noisy_dist[idx] += 1
+                    noisy_dists.append(noisy_dist / shots)
+                return torch.stack(noisy_dists)
+
+        elif method == "binomial":
+            return torch.distributions.Binomial(shots, distribution).sample() / shots
+
+        elif method == "gaussian":
+            std_dev = torch.sqrt(distribution * (1 - distribution) / shots)
+            noise = torch.randn_like(distribution) * std_dev
+            noisy_dist = distribution + noise
+            noisy_dist = torch.clamp(noisy_dist, 0, 1)
+            noisy_dist = noisy_dist / noisy_dist.sum(dim=-1, keepdim=True)
+            return noisy_dist
+
+
+def validate_positive_int(value, name):
+    """Validate that a value is a positive integer."""
+    if not isinstance(value, int) or value <= 0:
+        raise ValueError(f"{name} must be a positive integer, got {value}")
+    return value
+
+
+def validate_non_negative_int(value, name):
+    """Validate that a value is a non-negative integer."""
+    if not isinstance(value, int) or value < 0:
+        raise ValueError(f"{name} must be a non-negative integer, got {value}")
+    return value

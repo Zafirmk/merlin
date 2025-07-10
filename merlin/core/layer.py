@@ -27,19 +27,19 @@ Main QuantumLayer implementation with bug fixes and index_photons support.
 from __future__ import annotations
 
 import math
-
-import numpy as np
-import perceval as pcvl
+from typing import List, Optional, Tuple
 import torch
 import torch.nn as nn
+import perceval as pcvl
 
-from ..core.generators import CircuitType, StatePattern
-from ..core.photonicbackend import PhotonicBackend as Experiment
-from ..core.process import ComputationProcessFactory
-from ..sampling.autodiff import AutoDiffProcess
-from ..sampling.mappers import OutputMapper
-from ..sampling.strategies import OutputMappingStrategy
 from .ansatz import Ansatz, AnsatzFactory
+from ..sampling.strategies import OutputMappingStrategy
+from ..sampling.mappers import OutputMapper
+from ..sampling.autodiff import AutoDiffProcess
+from ..core.process import ComputationProcessFactory
+
+from ..core.photonicbackend import PhotonicBackend as Experiment
+from ..core.generators import CircuitType, StatePattern
 
 
 class QuantumLayer(nn.Module):
@@ -284,21 +284,7 @@ class QuantumLayer(nn.Module):
                     self.register_parameter(tp, parameter)
                     self.thetas.append(parameter)
 
-        # Setup reservoir parameters if needed
-        if ansatz.experiment.reservoir_mode and "phi_" in spec_mappings:
-            phi_list = spec_mappings["phi_"]
-            if phi_list:
-                phi_values = []
-                for _param_name in phi_list:
-                    # For reservoir mode, just use random values
-                    phi_values.append(2 * math.pi * np.random.rand())
-
-                phi_tensor = torch.tensor(
-                    phi_values, dtype=self.dtype, device=self.device
-                )
-                self.register_buffer("phi_static", phi_tensor)
-
-    def _setup_parameters_from_custom(self, trainable_parameters: list[str]):
+    def _setup_parameters_from_custom(self, trainable_parameters: List[str]):
         """Setup parameters from custom circuit configuration."""
         spec_mappings = self.computation_process.converter.spec_mappings
         self.thetas = []
@@ -396,7 +382,6 @@ class QuantumLayer(nn.Module):
         """Create dummy parameters for initialization."""
         params = list(self.thetas)
 
-        # Add dummy input parameters - FIXED: Use correct parameter count
         if self.auto_generation_mode:
             dummy_input = torch.zeros(
                 self.ansatz.total_shifters, dtype=self.dtype, device=self.device
@@ -495,7 +480,7 @@ class QuantumLayer(nn.Module):
 
         if apply_sampling and shots > 0:
             distribution = self.autodiff_process.sampling_noise.pcvl_sampler(
-                distribution, shots
+                distribution, shots, self.sampling_method
             )
 
         # Apply output mapping
@@ -622,6 +607,7 @@ class QuantumLayer(nn.Module):
             output_mapping_strategy=output_mapping_strategy,
             dtype=dtype,
             device=device,
+            no_bunching=no_bunching,  # PASS no_bunching to ansatz
         )
 
         # IMPORTANT: Override the ansatz's output_mapping_strategy to ensure our parameter is used

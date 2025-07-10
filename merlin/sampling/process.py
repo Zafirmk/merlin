@@ -74,6 +74,7 @@ class SamplingProcess:
         if method is None:
             method = self.method
 
+
         if method == "multinomial":
             if distribution.dim() == 1:
                 sampled_counts = torch.multinomial(

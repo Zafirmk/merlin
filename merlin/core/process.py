@@ -24,9 +24,9 @@
 Quantum computation processes and factories.
 """
 
-import perceval as pcvl
-import torch
 from typing import List, Optional
+import torch
+import perceval as pcvl
 from merlin.pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
 
 from .base import AbstractComputationProcess
@@ -78,6 +78,8 @@ class ComputationProcess(AbstractComputationProcess):
         else:
             parameter_specs = self.trainable_parameters + self.input_parameters
 
+        #TODO: in release:parameter_specs = self.trainable_parameters + self.input_parameters
+
         # Build unitary graph
         self.converter = CircuitConverter(
             self.circuit, parameter_specs, dtype=self.dtype, device=self.device
@@ -105,7 +107,7 @@ class ComputationProcess(AbstractComputationProcess):
             input_state = list(self.input_state.keys())[0]
         else:
             input_state = self.input_state
-        keys, distribution = self.simulation_graph.compute(unitary, input_state)
+        keys, distribution = self.simulation_graph.compute(unitary, self.input_state)
 
         return distribution
 
