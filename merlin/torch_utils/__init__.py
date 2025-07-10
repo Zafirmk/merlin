@@ -22,10 +22,10 @@
 
 from .torch_codes import (
     FeatureEncoder,
-    SamplingProcess,
-    OutputMapper,
     LexGroupingMapper,
     ModGroupingMapper,
+    OutputMapper,
+    SamplingProcess,
     validate_non_negative_int,
     validate_positive_int,
 )

@@ -20,10 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""
-"""
+""" """
 
-from typing import Optional
 import torch
 
 from ..core.generators import CircuitGenerator, StateGenerator
@@ -40,10 +38,10 @@ class Ansatz:
         self,
         PhotonicBackend: PhotonicBackend,
         input_size: int,
-        output_size: Optional[int] = None,
+        output_size: int | None = None,
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-        device: Optional[torch.device] = None,
-        dtype: Optional[torch.dtype] = None,
+        device: torch.device | None = None,
+        dtype: torch.dtype | None = None,
         no_bunching: bool = True,
     ):
         r"""Initialize the Ansatz with the given configuration.
@@ -130,8 +128,8 @@ class AnsatzFactory:
         input_size: int,
         output_size: int | None = None,
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-        device: Optional[torch.device] = None,
-        dtype: Optional[torch.dtype] = None,
+        device: torch.device | None = None,
+        dtype: torch.dtype | None = None,
         no_bunching: bool = True,
     ) -> Ansatz:
         r"""Create a complete ansatz configuration.

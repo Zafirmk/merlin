@@ -89,6 +89,38 @@ class CircuitConverter:
 
         Multiple parameters with grouping:
 
+        >>> # Circuit with multiple phase shifters
+        >>> circuit = (pcvl.Circuit(2)
+        ...            // pcvl.PS(pcvl.P("theta1"))
+        ...            // (1, pcvl.PS(pcvl.P("theta2"))))
+        >>>
+        >>> converter = CircuitConverter(circuit, input_specs=["theta"])
+        >>> theta_params = torch.tensor([0.1, 0.2], requires_grad=True)
+        >>> unitary = converter.to_tensor(theta_params)
+        >>> print(unitary.shape)  # torch.Size([2, 2])
+
+        Batch processing for training:
+
+        >>> # Batch of parameter values
+        >>> batch_params = torch.tensor([[0.1], [0.2], [0.3]], requires_grad=True)
+        >>> converter = CircuitConverter(circuit, input_specs=["phi"])
+        >>> batch_unitary = converter.to_tensor(batch_params)
+        >>> print(batch_unitary.shape)  # torch.Size([3, 1, 1])
+
+        Training integration:
+
+        >>> # Training loop with beam splitter
+        >>> circuit = pcvl.Circuit(2) // pcvl.BS.Rx(pcvl.P("theta"))
+        >>> converter = CircuitConverter(circuit, ["theta"])
+        >>> theta = torch.tensor([0.5], requires_grad=True)
+        >>> optimizer = torch.optim.Adam([theta], lr=0.01)
+        >>>
+        >>> for step in range(10):
+        ...     optimizer.zero_grad()
+        ...     unitary = converter.to_tensor(theta)
+        ...     loss = some_loss_function(unitary)
+        ...     loss.backward()
+        ...     optimizer.step()
     """
 
     def __init__(
@@ -98,8 +130,19 @@ class CircuitConverter:
         dtype: torch.dtype = torch.complex64,
         device: torch.device = torch.device("cpu"),
     ):
+        """Initialize the CircuitConverter with a Perceval circuit.
 
+        Args:
+            circuit: A parameterized Perceval Circuit object to convert
+            input_specs: List of parameter name prefixes for grouping parameters into separate tensors.\
+                         If None, all parameters go into a single tensor
+            dtype: Tensor data type (float32/complex64 or float64/complex128)
+            device: PyTorch device for tensor operations
 
+        Raises:
+            ValueError: If input_specs don't match any circuit parameters
+            TypeError: If circuit is not a Perceval Circuit object
+        """
 
         # device is the device where the tensors will be allocated, default is set with torch.device('xxx')
         # in pytorch module, there is no discovery of the device from parameters, so it is the user's responsibility to
@@ -110,9 +153,9 @@ class CircuitConverter:
 
         self.set_dtype(dtype)
 
-        assert isinstance(
-            circuit, Circuit
-        ), f"Expected a Perceval LO circuit, but got {type(circuit).__name__}"
+        assert isinstance(circuit, Circuit), (
+            f"Expected a Perceval LO circuit, but got {type(circuit).__name__}"
+        )
         self.circuit = circuit
 
         # Create parameter mapping - it will map parameter names to their index in the input tensors

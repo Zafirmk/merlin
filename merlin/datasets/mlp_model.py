@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Literal
+from typing import Literal
 
 import torch
 from torch import nn as nn
@@ -9,12 +9,12 @@ from torch import nn as nn
 class MLPConfig:
     """Configuration for Multi-Layer Perceptron"""
 
-    hidden_sizes: List[int] = None
+    hidden_sizes: list[int] = None
     dropout: float = 0.0
     activation: Literal[
         "relu", "tanh", "sigmoid", "leaky_relu", "elu", "gelu", "selu"
     ] = "relu"
-    normalization: Optional[Literal["batch", "layer"]] = None
+    normalization: Literal["batch", "layer"] | None = None
 
 
 class MLP(nn.Module):

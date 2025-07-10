@@ -23,11 +23,9 @@
 import math as math
 
 import torch
-
-from typing import Optional, Dict
-import math as math
 import torch.nn as nn
 import torch.nn.functional as F
+
 from ..core.generators import CircuitType
 from ..sampling.strategies import OutputMappingStrategy
 

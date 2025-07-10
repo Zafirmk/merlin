@@ -27,19 +27,18 @@ Main QuantumLayer implementation with bug fixes and index_photons support.
 from __future__ import annotations
 
 import math
-from typing import List, Optional, Tuple
+
+import perceval as pcvl
 import torch
 import torch.nn as nn
-import perceval as pcvl
 
-from .ansatz import Ansatz, AnsatzFactory
-from ..sampling.strategies import OutputMappingStrategy
-from ..sampling.mappers import OutputMapper
-from ..sampling.autodiff import AutoDiffProcess
-from ..core.process import ComputationProcessFactory
-
-from ..core.photonicbackend import PhotonicBackend as Experiment
 from ..core.generators import CircuitType, StatePattern
+from ..core.photonicbackend import PhotonicBackend as Experiment
+from ..core.process import ComputationProcessFactory
+from ..sampling.autodiff import AutoDiffProcess
+from ..sampling.mappers import OutputMapper
+from ..sampling.strategies import OutputMappingStrategy
+from .ansatz import Ansatz, AnsatzFactory
 
 
 class QuantumLayer(nn.Module):
@@ -284,7 +283,7 @@ class QuantumLayer(nn.Module):
                     self.register_parameter(tp, parameter)
                     self.thetas.append(parameter)
 
-    def _setup_parameters_from_custom(self, trainable_parameters: List[str]):
+    def _setup_parameters_from_custom(self, trainable_parameters: list[str]):
         """Setup parameters from custom circuit configuration."""
         spec_mappings = self.computation_process.converter.spec_mappings
         self.thetas = []

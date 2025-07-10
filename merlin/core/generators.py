@@ -24,10 +24,11 @@
 Quantum circuit generation utilities.
 """
 
-from enum import Enum
-import perceval as pcvl
-import numpy as np
 import random
+from enum import Enum
+
+import numpy as np
+import perceval as pcvl
 
 
 class CircuitType(Enum):

@@ -24,9 +24,9 @@
 Quantum computation processes and factories.
 """
 
-from typing import List, Optional
-import torch
 import perceval as pcvl
+import torch
+
 from merlin.pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
 
 from .base import AbstractComputationProcess
@@ -71,14 +71,15 @@ class ComputationProcess(AbstractComputationProcess):
     def _setup_computation_graphs(self):
         """Setup unitary and simulation computation graphs."""
         # Determine parameter specs
-        if self.reservoir_mode:
+        """if self.reservoir_mode:
             parameter_specs = (
                 self.trainable_parameters + self.input_parameters + ["phi_"]
             )
         else:
-            parameter_specs = self.trainable_parameters + self.input_parameters
+            parameter_specs = self.trainable_parameters + self.input_parameters"""
 
-        #TODO: in release:parameter_specs = self.trainable_parameters + self.input_parameters
+        # TODO: in release:
+        parameter_specs = self.trainable_parameters + self.input_parameters
 
         # Build unitary graph
         self.converter = CircuitConverter(
@@ -107,18 +108,21 @@ class ComputationProcess(AbstractComputationProcess):
             input_state = list(self.input_state.keys())[0]
         else:
             input_state = self.input_state
-        keys, distribution = self.simulation_graph.compute(unitary, self.input_state)
+        keys, distribution = self.simulation_graph.compute(unitary, input_state)
 
         return distribution
 
-    def compute_superposition_state(self, parameters: List[torch.Tensor]) -> torch.Tensor:
+    def compute_superposition_state(
+        self, parameters: list[torch.Tensor]
+    ) -> torch.Tensor:
         unitary = self.converter.to_tensor(*parameters)
 
         def is_swap_permutation(t1, t2):
-
             if t1 == t2:
                 return False
-            diff = [(i, i) for i, (x, y) in enumerate(zip(t1, t2)) if x != y]
+            diff = [
+                (i, i) for i, (x, y) in enumerate(zip(t1, t2, strict=False)) if x != y
+            ]
             if len(diff) != 2:
                 return False
             i, j = diff[0][0], diff[1][0]
@@ -126,9 +130,6 @@ class ComputationProcess(AbstractComputationProcess):
             return t1[i] == t2[j] and t1[j] == t2[i]
 
         def reorder_swap_chain(lst):
-
-            from collections import deque
-
             remaining = lst[:]
             chain = [remaining.pop(0)]  # Commence avec le premier élément
             while remaining:
@@ -148,7 +149,9 @@ class ComputationProcess(AbstractComputationProcess):
         distributions = distribution * self.input_state[prev_state]
 
         for fock_state in state_list:
-            keys, distribution = self.simulation_graph.compute_pa_inc(unitary, prev_state, fock_state)
+            keys, distribution = self.simulation_graph.compute_pa_inc(
+                unitary, prev_state, fock_state
+            )
             distributions += distribution * self.input_state[fock_state]
             prev_state = fock_state
 

@@ -538,8 +538,12 @@ class SLOSComputeGraph:
 
     def _prepare_pa_inc(self, unitary):
         self.ct_inverts = []
-        for layer_idx, (sources, destinations, modes) in enumerate(self.vectorized_operations):
-            self.ct_inverts.append(layer_compute_backward(unitary, sources, destinations, modes, self.m))
+        for _layer_idx, (sources, destinations, modes) in enumerate(
+            self.vectorized_operations
+        ):
+            self.ct_inverts.append(
+                layer_compute_backward(unitary, sources, destinations, modes, self.m)
+            )
 
     def to(self, dtype: torch.dtype, device: str | torch.device):
         """
@@ -644,9 +648,13 @@ class SLOSComputeGraph:
                 amplitudes = amplitudes.unsqueeze(1) @ torch.transpose(invert, -2, -1)
                 amplitudes = amplitudes.squeeze(1)
 
-            for layer_idx, (sources, destinations, modes) in enumerate(vectorized_operations):
+            for layer_idx, (sources, destinations, modes) in enumerate(
+                vectorized_operations
+            ):
                 p_pos = idx_n_pos[layer_idx]
-                amplitudes = layer_compute_vectorized(unitary, amplitudes, sources, destinations, modes, p_pos)
+                amplitudes = layer_compute_vectorized(
+                    unitary, amplitudes, sources, destinations, modes, p_pos
+                )
 
         self.prev_amplitudes = amplitudes
         # Calculate probabilities
