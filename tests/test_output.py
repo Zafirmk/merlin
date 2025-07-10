@@ -23,7 +23,7 @@
 import pytest
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 import merlin as ML
 
 
@@ -322,6 +322,8 @@ class TestOutputMappingIntegration:
 
     def test_mapping_gradient_flow(self):
         """Test gradient flow through different mapping strategies."""
+        
+        
         experiment = ML.PhotonicBackend(
             circuit_type=ML.CircuitType.PARALLEL_COLUMNS, n_modes=6, n_photons=2
         )
@@ -344,7 +346,10 @@ class TestOutputMappingIntegration:
 
             x = torch.rand(2, 2, requires_grad=True)
             output = layer(x)
-            loss = output.sum()
+            
+            # Use MSE loss instead of sum for better gradient flow
+            target = torch.ones_like(output)
+            loss = F.mse_loss(output, target)
             loss.backward()
 
             # Input should have gradients
