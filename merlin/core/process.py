@@ -27,8 +27,7 @@ Quantum computation processes and factories.
 import perceval as pcvl
 import torch
 
-from merlin.pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
-
+from ..pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
 from .base import AbstractComputationProcess
 
 

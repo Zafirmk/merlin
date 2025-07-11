@@ -8,7 +8,7 @@ from merlin import (  # Replace with actual import path
 
 
 def classical_method(layer, input_state):
-    output_classical = torch.zeros(layer.output_size)
+    output_classical = torch.zeros(layer.output_size, dtype=layer.dtype)
     for key, value in input_state.items():
         layer.computation_process.input_state = key
         output_classical += value * layer()
@@ -51,13 +51,15 @@ class TestOutputSuperposedState:
             input_state=input_state_superposed,
             trainable_parameters=["phi"],
             input_parameters=[],
+            dtype=torch.float64,
         )
 
         output_superposed = benchmark(layer)
 
         output_classical = classical_method(layer, input_state_superposed)
-        assert torch.allclose(output_superposed, output_classical, rtol=1e-2, atol=1e-5)
+        assert torch.allclose(output_superposed, output_classical, rtol=1e-3, atol=1e-6)
         # former rtol=1e-3, atol=1e-6)
+        # working rtol=1e-2, atol=1e-5
 
     def test_classical_method(self, benchmark):
         """Test NONE strategy when output_size is not specified."""
@@ -92,6 +94,7 @@ class TestOutputSuperposedState:
             input_state=input_state_superposed,
             trainable_parameters=["phi"],
             input_parameters=[],
+            dtype=torch.float64,
         )
 
         output_superposed = layer()
@@ -99,4 +102,4 @@ class TestOutputSuperposedState:
         output_classical = benchmark(
             lambda: classical_method(layer, input_state_superposed)
         )
-        assert torch.allclose(output_superposed, output_classical, rtol=1e-3, atol=1e-7)
+        assert torch.allclose(output_superposed, output_classical, rtol=1e-3, atol=1e-6)

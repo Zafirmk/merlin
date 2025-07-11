@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 import perceval as pcvl
 import torch
 import torch.nn as nn
@@ -283,6 +284,20 @@ class QuantumLayer(nn.Module):
                     self.register_parameter(tp, parameter)
                     self.thetas.append(parameter)
 
+        # Setup reservoir parameters if needed
+        if ansatz.experiment.reservoir_mode and "phi_" in spec_mappings:
+            phi_list = spec_mappings["phi_"]
+            if phi_list:
+                phi_values = []
+                for _param_name in phi_list:
+                    # For reservoir mode, just use random values
+                    phi_values.append(2 * math.pi * np.random.rand())
+
+                phi_tensor = torch.tensor(
+                    phi_values, dtype=self.dtype, device=self.device
+                )
+                self.register_buffer("phi_static", phi_tensor)
+
     def _setup_parameters_from_custom(self, trainable_parameters: list[str]):
         """Setup parameters from custom circuit configuration."""
         spec_mappings = self.computation_process.converter.spec_mappings
@@ -381,6 +396,7 @@ class QuantumLayer(nn.Module):
         """Create dummy parameters for initialization."""
         params = list(self.thetas)
 
+        # Add dummy input parameters - FIXED: Use correct parameter count
         if self.auto_generation_mode:
             dummy_input = torch.zeros(
                 self.ansatz.total_shifters, dtype=self.dtype, device=self.device
@@ -479,7 +495,7 @@ class QuantumLayer(nn.Module):
 
         if apply_sampling and shots > 0:
             distribution = self.autodiff_process.sampling_noise.pcvl_sampler(
-                distribution, shots, self.sampling_method
+                distribution, shots
             )
 
         # Apply output mapping
@@ -606,7 +622,6 @@ class QuantumLayer(nn.Module):
             output_mapping_strategy=output_mapping_strategy,
             dtype=dtype,
             device=device,
-            no_bunching=no_bunching,  # PASS no_bunching to ansatz
         )
 
         # IMPORTANT: Override the ansatz's output_mapping_strategy to ensure our parameter is used

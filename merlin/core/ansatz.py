@@ -20,7 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" """
+"""
+Ansatz configuration and factory for quantum layers.
+"""
 
 import torch
 
@@ -42,7 +44,6 @@ class Ansatz:
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
         device: torch.device | None = None,
         dtype: torch.dtype | None = None,
-        no_bunching: bool = True,
     ):
         r"""Initialize the Ansatz with the given configuration.
 
@@ -60,7 +61,6 @@ class Ansatz:
         self.output_mapping_strategy = output_mapping_strategy
         self.device = device
         self.dtype = dtype or torch.float32
-        self.no_bunching = no_bunching  # STORE no_bunching
 
         # Create feature encoder
         self.feature_encoder = FeatureEncoder(input_size)
@@ -113,7 +113,6 @@ class Ansatz:
             trainable_parameters=self.trainable_parameters,
             input_parameters=self.input_parameters,
             reservoir_mode=PhotonicBackend.reservoir_mode,
-            no_bunching=self.no_bunching,  # PASS no_bunching here
             dtype=self.dtype,
             device=self.device,
         )
@@ -130,7 +129,6 @@ class AnsatzFactory:
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
         device: torch.device | None = None,
         dtype: torch.dtype | None = None,
-        no_bunching: bool = True,
     ) -> Ansatz:
         r"""Create a complete ansatz configuration.
 
@@ -152,5 +150,4 @@ class AnsatzFactory:
             output_mapping_strategy=output_mapping_strategy,
             device=device,
             dtype=dtype,
-            no_bunching=no_bunching,  # PASS it through
         )
