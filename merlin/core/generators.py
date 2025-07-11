@@ -24,10 +24,8 @@
 Quantum circuit generation utilities.
 """
 
-import random
 from enum import Enum
 
-import numpy as np
 import perceval as pcvl
 
 

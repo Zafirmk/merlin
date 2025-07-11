@@ -26,7 +26,6 @@ Quantum computation processes and factories.
 
 import perceval as pcvl
 import torch
-from typing import List, Optional
 
 from ..pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
 from .base import AbstractComputationProcess
@@ -118,7 +117,6 @@ class ComputationProcess(AbstractComputationProcess):
         unitary = self.converter.to_tensor(*parameters)
 
         def is_swap_permutation(t1, t2):
-
             if t1 == t2:
                 return False
             diff = [
@@ -131,9 +129,6 @@ class ComputationProcess(AbstractComputationProcess):
             return t1[i] == t2[j] and t1[j] == t2[i]
 
         def reorder_swap_chain(lst):
-
-            from collections import deque
-
             remaining = lst[:]
             chain = [remaining.pop(0)]  # Commence avec le premier élément
             while remaining:

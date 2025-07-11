@@ -150,7 +150,6 @@ def layer_compute_vectorized(
         contributions.to(destinations.device),  # values to add
     )
 
-
     return result
 
 
@@ -202,10 +201,7 @@ def layer_compute_backward(
     batch_tensors = torch.stack(computing_tensors, dim=0)
     inverts = torch.linalg.pinv(batch_tensors)
 
-
-
     return inverts
-
 
 
 class SLOSComputeGraph:
@@ -253,7 +249,6 @@ class SLOSComputeGraph:
         self.prev_amplitudes = None
         self.dtype = dtype
         self.ct_inverts = None
-
 
         if index_photons is None:
             index_photons = [(0, self.m - 1)] * self.n_photons

@@ -1,7 +1,3 @@
-import torch
-import pytest
-import math
-from merlin import QuantumLayer, OutputMappingStrategy  # Replace with actual import path
 import perceval as pcvl
 import torch
 
@@ -62,7 +58,6 @@ class TestOutputSuperposedState:
 
         output_classical = classical_method(layer, input_state_superposed)
         assert torch.allclose(output_superposed, output_classical, rtol=1e-3, atol=1e-6)
-
 
     def test_classical_method(self, benchmark):
         """Test NONE strategy when output_size is not specified."""
