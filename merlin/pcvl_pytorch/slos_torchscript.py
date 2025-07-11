@@ -177,8 +177,6 @@ def layer_compute_backward(
     inverts = []
     computing_tensors = []
     for p in range(m):
-        _batch_size = unitary.shape[0]
-
         # Determine output size
         size_sources = int(sources.max().item()) + 1
         size_destinations = int(destinations.max().item()) + 1
@@ -767,7 +765,7 @@ def build_slos_distribution_computegraph(
         )
 
     # Attach the save method to the compute_graph
-    compute_graph.save = save
+    compute_graph.save = save  # type: ignore[attr-defined]
 
     return compute_graph
 
