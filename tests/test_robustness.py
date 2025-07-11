@@ -67,14 +67,12 @@ class TestRobustness:
         layer = ML.QuantumLayer(input_size=2, ansatz=ansatz)
 
         # Test boundary values
-        boundary_inputs = torch.tensor(
-            [
-                [0.0, 0.0],  # All zeros
-                [1.0, 1.0],  # All ones
-                [0.0, 1.0],  # Mixed
-                [1.0, 0.0],  # Mixed reverse
-            ]
-        )
+        boundary_inputs = torch.tensor([
+            [0.0, 0.0],  # All zeros
+            [1.0, 1.0],  # All ones
+            [0.0, 1.0],  # Mixed
+            [1.0, 0.0],  # Mixed reverse
+        ])
 
         output = layer(boundary_inputs)
 

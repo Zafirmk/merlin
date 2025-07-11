@@ -92,7 +92,7 @@ def main(args):
 
     crit_cycle, crit_idt = torch.nn.L1Loss(), torch.nn.L1Loss()
 
-    ##### LOAD PRETRAINED WEIGHTS #####
+    # LOAD PRETRAINED WEIGHTS #####
     if args.quantum_dynamic or args.cl_comp:
         print("- building the model")
         unet, l_modules_unet_encoder, l_modules_unet_decoder, l_modules_unet_others = (

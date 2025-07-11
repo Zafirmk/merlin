@@ -50,7 +50,7 @@ parser.add_argument(
 parser.add_argument("--hp", type=bool, default=False, help="Set Half Precision")
 
 
-def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
+def benchmark_bs(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
     """
     Benchmark memory usage for a GenericInterferometer running with MerLin support.
 
@@ -105,7 +105,7 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
     print(f"\n ----- \nWorking on {MODES} modes with {PHOTONS} photons \n -----")
 
     ####################################
-    ### Quantum Layer initialisation ###
+    # Quantum Layer initialisation ###
     ####################################
 
     # Building the input state from the number of photons
@@ -117,13 +117,11 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
     print(
         f"\n Create circuit with input state = {input_state} (nb photons = {sum(input_state)}, nb parameters = {nb_parameters})"
     )
-    input_size = len(
-        [
-            p.name
-            for p in circuit.get_parameters()
-            if p.name.startswith("theta") or p.name.startswith("phase")
-        ]
-    )
+    input_size = len([
+        p.name
+        for p in circuit.get_parameters()
+        if p.name.startswith("theta") or p.name.startswith("phase")
+    ])
     q_model = QuantumLayer(
         input_size=input_size,
         output_size=None,
@@ -139,7 +137,7 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
     t_end_layer = time.time() - t_start_layer
 
     ###################################
-    ### Computing the target values ###
+    # Computing the target values ###
     ###################################
 
     t_init = time.time()
@@ -171,7 +169,7 @@ def benchmark_BS(MODES=8, PHOTONS=4, BS=32, TYPE=torch.float32, set_hp=False):
 
     print("\n TRAINING IS STARTING \n")
     ##########################################
-    ### training loop to match the targets ###
+    # training loop to match the targets ###
     ##########################################
 
     # initialization of the parameters
@@ -320,7 +318,7 @@ if __name__ == "__main__":
     )
     assert args.photons > 0, "You need at least 1 photon !"
 
-    benchmark_BS(
+    benchmark_bs(
         MODES=args.modes,
         PHOTONS=args.photons,
         BS=args.bs,
