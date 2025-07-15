@@ -70,15 +70,7 @@ class ComputationProcess(AbstractComputationProcess):
     def _setup_computation_graphs(self):
         """Setup unitary and simulation computation graphs."""
         # Determine parameter specs
-        """if self.reservoir_mode:
-            parameter_specs = (
-                self.trainable_parameters + self.input_parameters + ["phi_"]
-            )
-        else:
-            parameter_specs = self.trainable_parameters + self.input_parameters"""
-
-        # TODO: in release:
-        parameter_specs = self.trainable_parameters + self.input_parameters
+        parameter_specs = self.trainable_parameters + list(self.input_parameters)
 
         # Build unitary graph
         self.converter = CircuitConverter(
