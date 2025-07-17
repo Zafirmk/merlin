@@ -100,13 +100,6 @@ class Ansatz:
         # Only pass parameter specs that actually exist in the circuit
         parameter_specs = self.trainable_parameters + self.input_parameters
 
-        # Filter out specs that don't match any circuit parameters
-        circuit_param_names = [p.name for p in circuit_params]
-        valid_specs = []
-        for spec in parameter_specs:
-            if any(name.startswith(spec) for name in circuit_param_names):
-                valid_specs.append(spec)
-
         self.computation_process = ComputationProcessFactory.create(
             circuit=self.circuit,
             input_state=self.input_state,
