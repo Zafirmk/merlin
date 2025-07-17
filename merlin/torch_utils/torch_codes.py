@@ -121,11 +121,6 @@ class ModGroupingMapper(nn.Module):
                 dtype=probability_distribution.dtype,
             )
             for b in range(batch_size):
-                result[b] = torch.zeros(
-                    self.output_size,
-                    device=probability_distribution.device,
-                    dtype=probability_distribution.dtype,
-                )
                 result[b].index_add_(0, group_indices, probability_distribution[b])
             return result
         else:
