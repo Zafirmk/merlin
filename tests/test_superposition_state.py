@@ -8,7 +8,7 @@ from merlin import (  # Replace with actual import path
 
 
 def classical_method(layer, input_state):
-    output_classical = torch.zeros(layer.output_size, dtype=layer.dtype)
+    output_classical = torch.zeros(layer.output_size, dtype=layer.dtype, device=layer.device)
     for key, value in input_state.items():
         layer.computation_process.input_state = key
         output_classical += value * layer()
