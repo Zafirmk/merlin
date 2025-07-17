@@ -97,8 +97,6 @@ class Ansatz:
             self.trainable_parameters = ["phi_"] if has_phi_params else []
 
         # Create computation process with proper dtype
-        # Only pass parameter specs that actually exist in the circuit
-        parameter_specs = self.trainable_parameters + self.input_parameters
 
         self.computation_process = ComputationProcessFactory.create(
             circuit=self.circuit,

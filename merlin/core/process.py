@@ -73,7 +73,11 @@ class ComputationProcess(AbstractComputationProcess):
         parameter_specs = self.trainable_parameters + list(self.input_parameters)
         # Include static phi parameters if reservoir_mode is enabled
         if self.reservoir_mode:
-            phi_parameters = [param for param in self.circuit.parameters if param.startswith("phi_")]
+            phi_parameters = [
+                param
+                for param in self.circuit.get_parameters()
+                if param.name.startswith("phi_")
+            ]
             parameter_specs += phi_parameters
 
         # Build unitary graph

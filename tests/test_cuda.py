@@ -20,12 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import merlin as ml
-from merlin import QuantumLayer
 import perceval as pcvl
 import pytest
 import torch
 import torch.nn as nn
+
+import merlin as ml
+from merlin import QuantumLayer
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
@@ -91,12 +92,12 @@ def test_switch_model_to_cuda():
 
 class QuantumClassifier_withAnsatz(nn.Module):
     def __init__(
-        self, input_dim, hidden_dim=100, modes=10, num_classes=2, input_state=None, device = 'cpu',
+        self, input_dim, hidden_dim=100, modes=10, num_classes=2, input_state=None, device="cpu",
     ):
         super().__init__()
 
         # This layer downscales the inputs to fit in the QLayer
-        self.downscaling_layer = nn.Linear(input_dim, hidden_dim, device = device)
+        self.downscaling_layer = nn.Linear(input_dim, hidden_dim, device=device)
 
         # Building the QLayer with Merlin
         experiment = ml.PhotonicBackend(
@@ -115,14 +116,14 @@ class QuantumClassifier_withAnsatz(nn.Module):
             input_size=hidden_dim,
             # output_size=output_size_slos,
             output_mapping_strategy=ml.OutputMappingStrategy.NONE,
-            device = device,
+            device=device,
         )
 
         # Build the QLayer using Merlin
-        self.q_circuit = ml.QuantumLayer(input_size=hidden_dim, ansatz=ansatz, device = device)
+        self.q_circuit = ml.QuantumLayer(input_size=hidden_dim, ansatz=ansatz, device=device)
 
         # Linear output layer as in the original paper
-        self.output_layer = nn.Linear(self.q_circuit.output_size, num_classes, device = device)
+        self.output_layer = nn.Linear(self.q_circuit.output_size, num_classes, device=device)
 
     def forward(self, x):
         # Forward pass through the quantum-classical hybrid
@@ -154,7 +155,7 @@ def test_QuantumClassifier_withAnsatz():
         modes=modes,
         num_classes=num_classes,
         input_state=input_state,
-        device = device,
+        device=device,
     )
 
     # Move model to GPU
@@ -195,7 +196,6 @@ def test_QuantumClassifier_withAnsatz():
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-
     print("\n✅ All tests passed successfully!")
 
     # Assertions for pytest
@@ -222,10 +222,10 @@ def test_different_configurations():
 
         model = QuantumClassifier_withAnsatz(
             input_dim=768,
-            hidden_dim=config['hidden_dim'],
-            modes=config['modes'],
+            hidden_dim=config["hidden_dim"],
+            modes=config["modes"],
             num_classes=2,
-            input_state=config['input_state'],
+            input_state=config["input_state"],
             device=device
         ).to(device)
 
