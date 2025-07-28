@@ -113,7 +113,7 @@ class TestPercevalComparison:
         # Set parameter values to match MerLin's computation
         for param_tensor in merlin_params:
             param_array = param_tensor.detach().numpy()
-            for p, val in zip(parameters, param_array.flatten(), strict=False):
+            for p, val in zip(parameters, param_array.flatten(), strict=True):
                 p.set_value(val)
 
         # Create QPU processor
