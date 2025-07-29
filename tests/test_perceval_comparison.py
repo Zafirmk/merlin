@@ -35,18 +35,20 @@ import merlin as ML
 class TestPercevalComparison:
     """Test suite comparing MerLin and direct Perceval approaches."""
 
+    TOLERANCE = 0.005
+    N_MODES = 12
+    N_PHOTONS = 3
+    N_SAMPLES = 1000000
+
     def test_probability_distribution_comparison_simple(self):
         """Test that MerLin gives same probability distribution as direct Perceval QPU."""
         # Configuration
-        M = 12  # number of modes
-        n_photons = 3
-        n_samples = 10000
 
         # Create custom Perceval circuit following the provided pattern
         from perceval.components import BS, PS
 
         # Create random unitary for decomposition
-        U = pcvl.Matrix.random_unitary(M)
+        U = pcvl.Matrix.random_unitary(self.N_MODES)
 
         # Decomposition of the unitary for Pre-circuit and Reservoir
         pre_U = pcvl.Circuit.decomposition(
@@ -55,23 +57,23 @@ class TestPercevalComparison:
         reservoir_U = pre_U.copy()
 
         # Add phases
-        phases_U = pcvl.Circuit(M, name="phases")
+        phases_U = pcvl.Circuit(self.N_MODES, name="phases")
         parameters = []
-        for i in range(M):
+        for i in range(self.N_MODES):
             parameter = pcvl.P(f"φ{i}")
             phases_U.add(i, PS(phi=parameter))
             parameters.append(parameter)
 
         chip = (
-            pcvl.Circuit(M)
+            pcvl.Circuit(self.N_MODES, name="chip")
             .add(0, pre_U)
             .add(0, phases_U, merge=False)
             .add(0, reservoir_U, merge=False)
         )
 
         # Create input state
-        input_state = [1] * n_photons + [0] * (
-            M - n_photons
+        input_state = [1] * self.N_PHOTONS + [0] * (
+            self.N_MODES - self.N_PHOTONS
         )  # Place photons in first modes
 
         # Check what parameters the circuit actually has
@@ -86,7 +88,7 @@ class TestPercevalComparison:
             input_size=len(all_params),
             circuit=chip,
             input_state=input_state,
-            n_photons=n_photons,
+            n_photons=self.N_PHOTONS,
             input_parameters=["φ"],
             trainable_parameters=[],
             output_mapping_strategy=ML.OutputMappingStrategy.NONE,
@@ -119,11 +121,11 @@ class TestPercevalComparison:
         # Create QPU processor
         qpu = pcvl.Processor("SLOS", chip)
         qpu.with_input(pcvl.BasicState(input_state))
-        qpu.min_detected_photons_filter(n_photons)
+        qpu.min_detected_photons_filter(self.N_PHOTONS)
 
         # Get probability distribution from Perceval
         sampler = Sampler(qpu)
-        perceval_sample_count = sampler.sample_count(n_samples)["results"]
+        perceval_sample_count = sampler.sample_count(self.N_SAMPLES)["results"]
 
         # Convert to probability distribution
         perceval_probs = np.zeros(len(keys))
@@ -136,13 +138,15 @@ class TestPercevalComparison:
         # Fill perceval probability array
         for state, count in perceval_sample_count.items():
             if state in key_to_index:
-                perceval_probs[key_to_index[state]] = count / n_samples
+                perceval_probs[key_to_index[state]] = count / self.N_SAMPLES
 
         perceval_probs /= sum(perceval_probs)  # Normalize to ensure it sums to 1
 
         # Compare probability distributions
         # Allow for small numerical differences due to sampling
-        tolerance = 0.01  # 1% tolerance due to computation and sampling differences
+        tolerance = (
+            self.TOLERANCE
+        )  # 1% tolerance due to computation and sampling differences
 
         # Check that distributions are similar
         diff = np.abs(merlin_probs - perceval_probs)
