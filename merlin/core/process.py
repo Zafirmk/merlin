@@ -27,8 +27,7 @@ Quantum computation processes and factories.
 import perceval as pcvl
 import torch
 
-from merlin.pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
-
+from ..pcvl_pytorch import CircuitConverter, build_slos_distribution_computegraph
 from .base import AbstractComputationProcess
 
 
@@ -71,12 +70,15 @@ class ComputationProcess(AbstractComputationProcess):
     def _setup_computation_graphs(self):
         """Setup unitary and simulation computation graphs."""
         # Determine parameter specs
+        parameter_specs = self.trainable_parameters + list(self.input_parameters)
+        # Include static phi parameters if reservoir_mode is enabled
         if self.reservoir_mode:
-            parameter_specs = (
-                self.trainable_parameters + self.input_parameters + ["phi_"]
-            )
-        else:
-            parameter_specs = self.trainable_parameters + self.input_parameters
+            phi_parameters = [
+                param
+                for param in self.circuit.get_parameters()
+                if param.name.startswith("phi_")
+            ]
+            parameter_specs += phi_parameters
 
         # Build unitary graph
         self.converter = CircuitConverter(

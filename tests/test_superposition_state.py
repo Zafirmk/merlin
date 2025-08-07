@@ -8,7 +8,7 @@ from merlin import (  # Replace with actual import path
 
 
 def classical_method(layer, input_state):
-    output_classical = torch.zeros(layer.output_size)
+    output_classical = torch.zeros(layer.output_size, dtype=layer.dtype, device=layer.device)
     for key, value in input_state.items():
         layer.computation_process.input_state = key
         output_classical += value * layer()
@@ -51,6 +51,7 @@ class TestOutputSuperposedState:
             input_state=input_state_superposed,
             trainable_parameters=["phi"],
             input_parameters=[],
+            dtype=torch.float64,
         )
 
         output_superposed = benchmark(layer)
@@ -91,6 +92,7 @@ class TestOutputSuperposedState:
             input_state=input_state_superposed,
             trainable_parameters=["phi"],
             input_parameters=[],
+            dtype=torch.float64,
         )
 
         output_superposed = layer()
