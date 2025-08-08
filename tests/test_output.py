@@ -23,6 +23,7 @@
 import pytest
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 import merlin as ML
 
@@ -344,7 +345,10 @@ class TestOutputMappingIntegration:
 
             x = torch.rand(2, 2, requires_grad=True)
             output = layer(x)
-            loss = output.sum()
+
+            # Use MSE loss instead of sum for better gradient flow
+            target = torch.ones_like(output)
+            loss = F.mse_loss(output, target)
             loss.backward()
 
             # Input should have gradients

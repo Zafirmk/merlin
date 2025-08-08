@@ -42,7 +42,6 @@ class Ansatz:
         input_size: int,
         output_size: int | None = None,
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-        device: torch.device | None = None,
         dtype: torch.dtype | None = None,
     ):
         r"""Initialize the Ansatz with the given configuration.
@@ -52,22 +51,24 @@ class Ansatz:
             input_size (int): Size of the input feature vector.
             output_size (int | None): Size of the output vector. If None, it is defined by the backend.
             output_mapping_strategy (OutputMappingStrategy): Strategy for mapping outputs.
-            device (torch.device | None): Device to run computations on.
             dtype (torch.dtype | None): Data type for computations.
         """
         self.experiment = PhotonicBackend
         self.input_size = input_size
         self.output_size = output_size
         self.output_mapping_strategy = output_mapping_strategy
-        self.device = device
         self.dtype = dtype or torch.float32
+        self.device: torch.device | None = None
 
         # Create feature encoder
         self.feature_encoder = FeatureEncoder(input_size)
 
-        # Generate circuit and state
+        # Generate circuit and state - PASS RESERVOIR MODE TO CIRCUIT GENERATOR
         self.circuit, self.total_shifters = CircuitGenerator.generate_circuit(
-            PhotonicBackend.circuit_type, PhotonicBackend.n_modes, input_size
+            PhotonicBackend.circuit_type,
+            PhotonicBackend.n_modes,
+            input_size,
+            reservoir_mode=PhotonicBackend.reservoir_mode,
         )
 
         self.input_state = StateGenerator.generate_state(
@@ -81,16 +82,31 @@ class Ansatz:
         self.trainable_parameters = [] if PhotonicBackend.reservoir_mode else ["phi_"]
         # self.trainable_parameters= ["phi"]
 
+        # Get circuit parameters once
+        circuit_params = self.circuit.get_parameters()
+
+        # In reservoir mode, the circuit has no trainable parameters
+        # because interferometers use fixed random values
+        if PhotonicBackend.reservoir_mode:
+            self.trainable_parameters = []
+        else:
+            # Only add phi_ if the circuit actually has phi_ parameters
+            has_phi_params = any(p.name.startswith("phi_") for p in circuit_params)
+            self.trainable_parameters = ["phi_"] if has_phi_params else []
+        self.reservoir_mode = PhotonicBackend.reservoir_mode
         # Create computation process with proper dtype
+
+    def _build_computation_process(self):
         self.computation_process = ComputationProcessFactory.create(
             circuit=self.circuit,
             input_state=self.input_state,
             trainable_parameters=self.trainable_parameters,
             input_parameters=self.input_parameters,
-            reservoir_mode=PhotonicBackend.reservoir_mode,
+            reservoir_mode=self.reservoir_mode,
             dtype=self.dtype,
             device=self.device,
         )
+        return self.computation_process
 
 
 class AnsatzFactory:
@@ -102,7 +118,6 @@ class AnsatzFactory:
         input_size: int,
         output_size: int | None = None,
         output_mapping_strategy: OutputMappingStrategy = OutputMappingStrategy.LINEAR,
-        device: torch.device | None = None,
         dtype: torch.dtype | None = None,
     ) -> Ansatz:
         r"""Create a complete ansatz configuration.
@@ -112,7 +127,6 @@ class AnsatzFactory:
             input_size (int): Size of the input feature vector.
             output_size (int | None): Size of the output vector. If None, it is defined by the backend.
             output_mapping_strategy (OutputMappingStrategy): Strategy for mapping outputs.
-            device (torch.device | None): Device to run computations on.
             dtype (torch.dtype | None): Data type for computations.
 
         Returns:
@@ -123,6 +137,5 @@ class AnsatzFactory:
             input_size=input_size,
             output_size=output_size,
             output_mapping_strategy=output_mapping_strategy,
-            device=device,
             dtype=dtype,
         )
