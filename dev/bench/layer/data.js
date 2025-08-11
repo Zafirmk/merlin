@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754426849990,
+  "lastUpdate": 1754919963666,
   "repoUrl": "https://github.com/Zafirmk/merlin",
   "entries": {
     "Benchmark": [
@@ -206,6 +206,212 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.049038695488580246",
             "extra": "mean: 337.68210979999367 msec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "zafirmk0@gmail.com",
+            "name": "Zafir Khalid",
+            "username": "Zafirmk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7358df41ce48f0a851ebed68ad625441fa2730b2",
+          "message": "Update benchmark.yml with permissions",
+          "timestamp": "2025-08-11T09:42:09-04:00",
+          "tree_id": "89c65e6fd949eb2e079f8cb8fa136458b34612fb",
+          "url": "https://github.com/Zafirmk/merlin/commit/7358df41ce48f0a851ebed68ad625441fa2730b2"
+        },
+        "date": 1754919963057,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/benchmark_layer.py::test_quantum_layer_forward_benchmark[cpu-config0]",
+            "value": 176.08576047976737,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006805333002228421",
+            "extra": "mean: 5.6790509197074 msec\nrounds: 137"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_quantum_layer_forward_benchmark[cpu-config1]",
+            "value": 53.046985860832656,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0007074957844978183",
+            "extra": "mean: 18.851212444444503 msec\nrounds: 45"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_quantum_layer_forward_benchmark[cpu-config2]",
+            "value": 21.35257991653228,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0008401479978544138",
+            "extra": "mean: 46.83274826316177 msec\nrounds: 19"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_quantum_layer_forward_benchmark[cpu-config3]",
+            "value": 9.834418147511464,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000995764438361964",
+            "extra": "mean: 101.68369749999329 msec\nrounds: 6"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-8-config0]",
+            "value": 264.9057692765623,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000050297328038197114",
+            "extra": "mean: 3.774927223106257 msec\nrounds: 251"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-8-config1]",
+            "value": 134.45500999382378,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006383189993640864",
+            "extra": "mean: 7.437432045454722 msec\nrounds: 132"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-8-config2]",
+            "value": 76.88482249410592,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0003593447282072806",
+            "extra": "mean: 13.00646821518852 msec\nrounds: 79"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-8-config3]",
+            "value": 49.38399364951887,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00025972982776270175",
+            "extra": "mean: 20.249476117647742 msec\nrounds: 51"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-16-config0]",
+            "value": 260.3913061520751,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007453374392124179",
+            "extra": "mean: 3.84037399242498 msec\nrounds: 264"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-16-config1]",
+            "value": 130.61955654660292,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006761725422007252",
+            "extra": "mean: 7.655821428571581 msec\nrounds: 126"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-16-config2]",
+            "value": 73.18629704036107,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0019049738027597627",
+            "extra": "mean: 13.663760026668873 msec\nrounds: 75"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-16-config3]",
+            "value": 48.19824579828514,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0002271844411466554",
+            "extra": "mean: 20.747643061224842 msec\nrounds: 49"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-32-config0]",
+            "value": 257.18371943496885,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003816391445864518",
+            "extra": "mean: 3.8882710079665785 msec\nrounds: 251"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-32-config1]",
+            "value": 128.7625535815394,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006808492748013094",
+            "extra": "mean: 7.766233056000601 msec\nrounds: 125"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-32-config2]",
+            "value": 73.19268083017475,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00013688807610647648",
+            "extra": "mean: 13.6625682876714 msec\nrounds: 73"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-32-config3]",
+            "value": 45.20171519913309,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00016310779985732578",
+            "extra": "mean: 22.123054304345928 msec\nrounds: 46"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-64-config0]",
+            "value": 254.6983354619218,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00003621179747875051",
+            "extra": "mean: 3.9262133307090386 msec\nrounds: 254"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-64-config1]",
+            "value": 124.51492887353041,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006178887860965875",
+            "extra": "mean: 8.031165491936298 msec\nrounds: 124"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-64-config2]",
+            "value": 69.66083167328944,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00010819962469785863",
+            "extra": "mean: 14.355269323944022 msec\nrounds: 71"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_batched_computation_benchmark[cpu-64-config3]",
+            "value": 39.10534077916743,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0013965548296010308",
+            "extra": "mean: 25.571954624999194 msec\nrounds: 40"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_gradient_computation_benchmark[cpu-config0]",
+            "value": 81.30450031370255,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00020368560686866074",
+            "extra": "mean: 12.299442172839555 msec\nrounds: 81"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_gradient_computation_benchmark[cpu-config1]",
+            "value": 24.432383351708058,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00012481853366044522",
+            "extra": "mean: 40.92928576000304 msec\nrounds: 25"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_multiple_circuit_types_benchmark[cpu-config0]",
+            "value": 13.354237726393514,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0019677156811278413",
+            "extra": "mean: 74.88259685714483 msec\nrounds: 14"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_multiple_circuit_types_benchmark[cpu-config1]",
+            "value": 3.592046146585695,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05354769988410384",
+            "extra": "mean: 278.3928600000081 msec\nrounds: 5"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_output_mapping_strategies_benchmark[cpu-config0]",
+            "value": 11.722786599609208,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00215722765129392",
+            "extra": "mean: 85.30394983333878 msec\nrounds: 12"
+          },
+          {
+            "name": "benchmarks/benchmark_layer.py::test_output_mapping_strategies_benchmark[cpu-config1]",
+            "value": 2.9617361109473697,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04498159622481449",
+            "extra": "mean: 337.63980400000264 msec\nrounds: 5"
           }
         ]
       }
