@@ -65,7 +65,7 @@ def my_vae_decoder_fwd(self, sample, latent_embeds=None):
 def download_url(url, outf):
     if not os.path.exists(outf):
         print(f"Downloading checkpoint to {outf}")
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, timeout=30)
         total_size_in_bytes = int(response.headers.get("content-length", 0))
         block_size = 1024  # 1 Kibibyte
         progress_bar = tqdm(total=total_size_in_bytes, unit="iB", unit_scale=True)

@@ -515,6 +515,7 @@ class CircuitConverter:
             phase = torch.tensor(
                 comp.param("phi")._value, dtype=self.tensor_fdtype, device=self.device
             )
+        phase = phase.to(self.tensor_cdtype)
 
         if comp._max_error:
             err = float(comp._max_error) * random.uniform(-1, 1)
