@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754919962107,
+  "lastUpdate": 1754920457822,
   "repoUrl": "https://github.com/Zafirmk/merlin",
   "entries": {
     "Benchmark": [
@@ -552,6 +552,282 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00001299546428765758",
             "extra": "mean: 311.62253858412504 usec\nrounds: 2514"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "zafirmk0@gmail.com",
+            "name": "Zafir Khalid",
+            "username": "Zafirmk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9f7cdaebd674a912cd2be93a9c71339bf87b65be",
+          "message": "Remove custom push url",
+          "timestamp": "2025-08-11T09:50:34-04:00",
+          "tree_id": "63e02a24d64e4c56d1cadc6d5ff839c02284599f",
+          "url": "https://github.com/Zafirmk/merlin/commit/9f7cdaebd674a912cd2be93a9c71339bf87b65be"
+        },
+        "date": 1754920457391,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair0-cpu-config0]",
+            "value": 23084.273704151357,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00002671237792309871",
+            "extra": "mean: 43.31953488405248 usec\nrounds: 4257"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair0-cpu-config1]",
+            "value": 8930.90680787193,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004115963522066057",
+            "extra": "mean: 111.97071266252318 usec\nrounds: 7218"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair0-cpu-config2]",
+            "value": 2363.062295631839,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00005434700026716164",
+            "extra": "mean: 423.17970281550225 usec\nrounds: 1669"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair0-cpu-config3]",
+            "value": 412.0479447269932,
+            "unit": "iter/sec",
+            "range": "stddev: 0.005702470060320068",
+            "extra": "mean: 2.42690204573781 msec\nrounds: 481"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair1-cpu-config0]",
+            "value": 22784.242518373718,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000027428989796459142",
+            "extra": "mean: 43.88998226267904 usec\nrounds: 13700"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair1-cpu-config1]",
+            "value": 8864.253132173555,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004228814289236573",
+            "extra": "mean: 112.81266284808763 usec\nrounds: 7071"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair1-cpu-config2]",
+            "value": 2337.431497900036,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000638990643892941",
+            "extra": "mean: 427.8200242010971 usec\nrounds: 1157"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_build_graph_benchmark[dtype_pair1-cpu-config3]",
+            "value": 445.34422627623917,
+            "unit": "iter/sec",
+            "range": "stddev: 0.005078779710421698",
+            "extra": "mean: 2.2454540577780335 msec\nrounds: 450"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair0-cpu-config0]",
+            "value": 6012.140941697054,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000009806620396694569",
+            "extra": "mean: 166.3300993269344 usec\nrounds: 1188"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair0-cpu-config1]",
+            "value": 4597.904973527717,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000012402959469362951",
+            "extra": "mean: 217.490358273489 usec\nrounds: 2085"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair0-cpu-config2]",
+            "value": 3241.702307118809,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001799792787048378",
+            "extra": "mean: 308.47989891113394 usec\nrounds: 2572"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair0-cpu-config3]",
+            "value": 1677.8901056975,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000051469419678296135",
+            "extra": "mean: 595.9865885163554 usec\nrounds: 1463"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair1-cpu-config0]",
+            "value": 5998.0276378521785,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000921222772266839",
+            "extra": "mean: 166.72147252027136 usec\nrounds: 4476"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair1-cpu-config1]",
+            "value": 4582.425747420448,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011286214307670537",
+            "extra": "mean: 218.22503082846958 usec\nrounds: 3406"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair1-cpu-config2]",
+            "value": 3178.9983468810533,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000015198805143052985",
+            "extra": "mean: 314.5644919825485 usec\nrounds: 2744"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_benchmark[dtype_pair1-cpu-config3]",
+            "value": 1630.4448535951026,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000017615850364133428",
+            "extra": "mean: 613.3295448754476 usec\nrounds: 1415"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[8-dtype_pair0-cpu-config0]",
+            "value": 6164.781009166215,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014897949051838072",
+            "extra": "mean: 162.21176364791094 usec\nrounds: 4781"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[8-dtype_pair0-cpu-config1]",
+            "value": 4787.040926234927,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000023688801370771124",
+            "extra": "mean: 208.89731577593045 usec\nrounds: 4006"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[8-dtype_pair1-cpu-config0]",
+            "value": 6110.319415158094,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000009821302616701633",
+            "extra": "mean: 163.6575655143761 usec\nrounds: 4976"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[8-dtype_pair1-cpu-config1]",
+            "value": 4752.856189148951,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001336387670005797",
+            "extra": "mean: 210.39980176195076 usec\nrounds: 3859"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[16-dtype_pair0-cpu-config0]",
+            "value": 6047.871411227003,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000010762655583066859",
+            "extra": "mean: 165.34743085701922 usec\nrounds: 4563"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[16-dtype_pair0-cpu-config1]",
+            "value": 4600.950313257181,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011988890014040712",
+            "extra": "mean: 217.3464027895714 usec\nrounds: 3585"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[16-dtype_pair1-cpu-config0]",
+            "value": 5998.948697902369,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000010608505096564462",
+            "extra": "mean: 166.69587462044248 usec\nrounds: 4283"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[16-dtype_pair1-cpu-config1]",
+            "value": 4588.342955271761,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011148301637910818",
+            "extra": "mean: 217.94360398693684 usec\nrounds: 3813"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[32-dtype_pair0-cpu-config0]",
+            "value": 5899.829168748717,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001010961499605136",
+            "extra": "mean: 169.49643309961937 usec\nrounds: 4701"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[32-dtype_pair0-cpu-config1]",
+            "value": 4344.606365083623,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000012555678590969694",
+            "extra": "mean: 230.17044951108073 usec\nrounds: 3377"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[32-dtype_pair1-cpu-config0]",
+            "value": 5890.482046814161,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000009769580821903108",
+            "extra": "mean: 169.76539306165023 usec\nrounds: 4727"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[32-dtype_pair1-cpu-config1]",
+            "value": 4313.599585778279,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000012082930671232453",
+            "extra": "mean: 231.82494807745942 usec\nrounds: 3563"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[64-dtype_pair0-cpu-config0]",
+            "value": 5668.397373346325,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000958289196351491",
+            "extra": "mean: 176.41670725170988 usec\nrounds: 4468"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[64-dtype_pair0-cpu-config1]",
+            "value": 3894.4764679372047,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000019258032083394366",
+            "extra": "mean: 256.7739228193801 usec\nrounds: 2993"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[64-dtype_pair1-cpu-config0]",
+            "value": 5681.806021673197,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000010658842920491173",
+            "extra": "mean: 176.00037667345717 usec\nrounds: 4407"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[64-dtype_pair1-cpu-config1]",
+            "value": 3825.203767031218,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000013981162739435704",
+            "extra": "mean: 261.4239818068857 usec\nrounds: 3188"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[128-dtype_pair0-cpu-config0]",
+            "value": 5305.577911853418,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011109802825685054",
+            "extra": "mean: 188.48088118089026 usec\nrounds: 4166"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[128-dtype_pair0-cpu-config1]",
+            "value": 3231.6573643613415,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000012876436564974612",
+            "extra": "mean: 309.43874527911953 usec\nrounds: 2489"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[128-dtype_pair1-cpu-config0]",
+            "value": 5253.794935784685,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011474670903780662",
+            "extra": "mean: 190.33860518399624 usec\nrounds: 4012"
+          },
+          {
+            "name": "benchmarks/benchmark_slos_core.py::test_compute_batched_benchmark[128-dtype_pair1-cpu-config1]",
+            "value": 3148.360070670816,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000016000559932871603",
+            "extra": "mean: 317.62567735364894 usec\nrounds: 2464"
           }
         ]
       }
